@@ -1,0 +1,4488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>营销活动分析平台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa; 
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* 顶部活动概览区域 */
+        .top-section {
+            background: #fff;
+            border-radius: 8px;
+            margin: 16px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .activity-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .activity-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4a90d9, #6ba3e0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .activity-info {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .activity-subtitle {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        .progress-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90d9, #5ba0e8);
+            border-radius: 4px;
+            width: 20%;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .activity-meta {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .activity-meta span {
+            margin-right: 16px;
+        }
+        
+        /* 数据卡片区域 */
+        .data-section {
+            display: flex;
+            gap: 0;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 20px;
+        }
+        
+        .data-column {
+            flex: 1;
+            padding: 0 16px;
+            border-right: 1px solid #f0f0f0;
+        }
+        
+        .data-column:last-child {
+            border-right: none;
+        }
+        
+        .data-column-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        
+        .data-column-header::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #4a90d9;
+            border-radius: 2px;
+        }
+        
+        .data-column-header.today::before {
+            background: #52c41a;
+        }
+        
+        .kpi-row {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .kpi-item {
+            text-align: center;
+        }
+        
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        
+        .kpi-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .kpi-sub-value {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        /* 主Tab导航 */
+        .main-tabs {
+            background: #fff;
+            margin: 0 16px 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 0 20px;
+        }
+        
+        .tab-item {
+            padding: 14px 20px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab-item:hover {
+            color: #4a90d9;
+        }
+        
+        .tab-item.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 目标分析 - 活动目标详情面板 */
+        .goal-detail-panel {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .goal-tab-bar {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        .goal-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            border-right: 1px solid #f0f0f0;
+            transition: all 0.2s;
+        }
+        .goal-tab:last-child { border-right: none; }
+        .goal-tab:hover { background: #f0f7ff; }
+        .goal-tab.active { background: #fff; border-bottom-color: #4a90d9; }
+        .goal-tab-icon {
+            width: 36px; height: 36px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; background: #f0f0f0; flex-shrink: 0;
+        }
+        .goal-tab.active .goal-tab-icon { background: #e6f4ff; }
+        .goal-tab-text { min-width: 0; }
+        .goal-tab-title { font-size: 13px; color: #333; font-weight: 500; white-space: nowrap; }
+        .goal-tab-rate { font-size: 16px; font-weight: 600; color: #333; }
+        .goal-tab-sub { font-size: 10px; color: #999; }
+        .goal-panel-body { padding: 20px; }
+        .goal-condition-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .goal-condition-left { flex: 1; }
+        .goal-condition-line { font-size: 13px; color: #666; margin-bottom: 6px; }
+        .goal-condition-line strong { color: #333; font-weight: 500; }
+        .goal-condition-time { font-size: 12px; color: #999; }
+        .goal-progress-ring-small { text-align: center; flex-shrink: 0; margin-left: 20px; }
+        .goal-customer-cards { display: flex; gap: 16px; }
+        .goal-customer-card { flex: 1; border-radius: 8px; padding: 16px; background: #fafafa; }
+        .goal-customer-card.green-border { border: 1px solid #b7eb8f; }
+        .goal-customer-card.orange-border { border: 1px solid #ffd591; }
+        .goal-customer-card-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .goal-customer-card-bar { width: 4px; height: 16px; border-radius: 2px; margin-right: 8px; }
+        .goal-customer-card-bar.green-bar { background: #52c41a; }
+        .goal-customer-card-bar.orange-bar { background: #fa8c16; }
+        .goal-customer-card-title { font-size: 14px; font-weight: 500; color: #333; }
+        .goal-customer-card-num { margin-left: auto; text-align: right; }
+        .goal-customer-value { font-size: 18px; font-weight: 600; color: #333; }
+        .goal-customer-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
+        .goal-customer-badge.green-badge { color: #52c41a; background: #f6ffed; }
+        .goal-customer-metrics {
+            display: flex; justify-content: space-around; text-align: center;
+            padding-top: 12px; border-top: 1px dashed #e8e8e8;
+        }
+        .goal-customer-metric .metric-label { font-size: 11px; color: #999; margin-bottom: 4px; }
+        .goal-customer-metric .metric-value { font-size: 16px; font-weight: 500; color: #333; }
+
+        
+        /* 目标条件配置表 */
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .section-title-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .section-title-text::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #4a90d9;
+            border-radius: 2px;
+        }
+        
+        .section-subtitle {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .data-table td {
+            color: #333;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status-badge.success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .status-badge.warning {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+        
+        /* 目标趋势 */
+        .chart-section {
+            margin-top: 20px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .chart-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chart-tab {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+            background: #f5f5f5;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .chart-tab.active {
+            background: #4a90d9;
+            color: #fff;
+        }
+        
+        .date-picker {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .chart-container {
+            height: 280px;
+            background: #fafafa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .chart-placeholder {
+            text-align: center;
+            color: #999;
+        }
+        
+        .chart-placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+        
+        .chart-legend {
+            display: flex;
+            gap: 24px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        /* 过程分析 - 流程图 */
+        .flow-container {
+            position: relative;
+            min-height: 400px;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 40px;
+            overflow: hidden;
+        }
+        
+        .flow-canvas {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+        
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .flow-node-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .flow-node-icon.green { background: #52c41a; color: #fff; }
+        .flow-node-icon.blue { background: #1890ff; color: #fff; }
+        .flow-node-icon.orange { background: #fa8c16; color: #fff; }
+        .flow-node-icon.red { background: #ff4d4f; color: #fff; }
+        .flow-node-icon.gray { background: #8c8c8c; color: #fff; }
+        .flow-node-icon.cyan { background: #13c2c2; color: #fff; }
+        
+        .flow-node-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .flow-node-sub {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .flow-connector {
+            width: 40px;
+            height: 2px;
+            background: #d9d9d9;
+            position: relative;
+        }
+        
+        .flow-connector::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            border: 5px solid transparent;
+            border-left: 5px solid #d9d9d9;
+        }
+        
+        .flow-branch {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .flow-branch-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        /* 策略弹板 */
+        .strategy-panel {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 320px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border: 1px solid #e8e8e8;
+        }
+        
+        .strategy-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .strategy-panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .strategy-panel-close {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #999;
+            font-size: 16px;
+        }
+        
+        .strategy-panel-content {
+            padding: 16px;
+        }
+        
+        .strategy-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        
+        .strategy-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .strategy-info-label {
+            color: #666;
+        }
+        
+        .strategy-info-value {
+            color: #fa8c16;
+            font-weight: 500;
+        }
+        
+        .strategy-panel-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .strategy-panel-btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+        }
+        
+        .strategy-panel-btn.primary {
+            background: #fa8c16;
+            color: #fff;
+            border-color: #fa8c16;
+        }
+        
+        /* 组件弹窗 */
+        .component-modal {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 360px;
+            max-height: 80%;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border: 1px solid #e8e8e8;
+            z-index: 10;
+        }
+        
+        .component-modal-overlay {
+            display: none;
+        }
+        
+        .component-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .component-modal-tabs {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .component-modal-tab {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            padding-bottom: 4px;
+        }
+        
+        .component-modal-tab.active {
+            color: #fa8c16;
+            border-bottom: 2px solid #fa8c16;
+        }
+        
+        .component-modal-content {
+            padding: 16px;
+        }
+        
+        .component-stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        
+        .component-stat-label {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .component-stat-label::before {
+            content: '';
+            width: 2px;
+            height: 12px;
+            background: #fa8c16;
+        }
+        
+        .component-stat-value {
+            color: #fa8c16;
+            font-weight: 500;
+        }
+        
+        .component-stat-value.clickable {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+            text-underline-offset: 3px;
+        }
+        
+        .component-stat-value.clickable:hover {
+            color: #d46b08;
+        }
+        
+        /* 可点击的数字 */
+        .strategy-info-value.clickable {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+            text-underline-offset: 3px;
+        }
+        
+        .strategy-info-value.clickable:hover {
+            color: #d46b08;
+        }
+        
+        /* 客户明细弹窗 */
+        .customer-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .customer-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 850px;
+            max-height: 80vh;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .customer-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        
+        .customer-modal-tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            overflow-y: auto;
+            max-height: 120px;
+        }
+        
+        .customer-modal-tab {
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            padding-bottom: 6px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .customer-modal-tab.active {
+            color: #fa8c16;
+            border-bottom-color: #fa8c16;
+            font-weight: 500;
+        }
+        
+        .customer-modal-tab:hover {
+            color: #fa8c16;
+        }
+        
+        .customer-tab-group-label {
+            font-size: 12px;
+            color: #999;
+            padding-bottom: 6px;
+            border-bottom: none;
+            margin-right: 16px;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        
+        .customer-modal-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #999;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .customer-modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .customer-modal-body {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .customer-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .customer-table th {
+            background: #fafafa;
+            padding: 10px 12px;
+            text-align: left;
+            color: #666;
+            font-weight: 500;
+            border-bottom: 1px solid #e8e8e8;
+            position: sticky;
+            top: 0;
+        }
+        
+        .customer-table td {
+            padding: 10px 12px;
+            color: #333;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .customer-table tr:hover td {
+            background: #fafafa;
+        }
+        
+        /* 客户工具栏 */
+        .customer-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .customer-toolbar-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .customer-toolbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .customer-search-input {
+            width: 200px;
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .customer-search-input:focus {
+            border-color: #fa8c16;
+        }
+        
+        .customer-search-input::placeholder {
+            color: #bbb;
+        }
+        
+        .btn-sm {
+            height: 32px;
+            padding: 0 14px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+        }
+        
+        .btn-outline {
+            background: #fff;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        
+        .btn-outline:hover {
+            color: #fa8c16;
+            border-color: #fa8c16;
+        }
+        
+        .customer-table th:first-child,
+        .customer-table td:first-child {
+            width: 40px;
+            text-align: center;
+            padding: 10px 8px;
+        }
+        
+        .customer-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #fa8c16;
+        }
+        
+        .customer-table tr.selected td {
+            background: #fff7e6;
+        }
+        
+        .customer-selected-info {
+            padding: 8px 0 0 0;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .customer-selected-info span {
+            color: #fa8c16;
+            font-weight: 600;
+        }
+        
+        /* 恢复按钮大小写 */
+        .btn-outline.btn-sm,
+        .btn.btn-sm {
+            height: 32px;
+            padding: 0 14px;
+            font-size: 13px;
+        }
+        
+        /* 渠道分析 */
+        .channel-overview {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: stretch;
+        }
+        
+        .channel-pie-section {
+            flex: 1.4;
+            min-width: 320px;
+            background: #fff;
+            border: 2px solid #fa8c16;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(250,140,22,0.08);
+        }
+        
+        .channel-pie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .channel-pie-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .channel-pie-chart {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .channel-pie-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .channel-pie-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        
+        .channel-pie-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .channel-pie-legend {
+            margin-top: 10px;
+        }
+        
+        .channel-legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+            font-size: 11px;
+        }
+        
+        .channel-legend-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .channel-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        .channel-ranking-card {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+        
+        .channel-ranking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .channel-ranking-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .channel-filter-dropdown {
+            padding: 4px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            background: #fff;
+        }
+        
+        .channel-ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .channel-rank-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .channel-rank-num.top3 {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .channel-rank-info {
+            flex: 1;
+        }
+        
+        .channel-rank-name {
+            font-size: 13px;
+            color: #1a1a1a;
+        }
+        
+        .channel-rank-rate {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .channel-rank-value {
+            font-size: 13px;
+            color: #666;
+            text-align: right;
+        }
+        
+        /* 渠道数量明细Tab */
+        .channel-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+        }
+        
+        .channel-tab {
+            padding: 10px 20px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .channel-tab.active {
+            color: #fa8c16;
+            border-bottom-color: #fa8c16;
+        }
+        
+        .channel-metric-cards {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .channel-metric-card {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .channel-metric-card.active {
+            border-color: #fa8c16;
+            background: #fff7e6;
+        }
+        
+        .channel-metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .channel-metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        
+        .channel-metric-sub {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        /* 转化分析 */
+        .conversion-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        
+        .conversion-overview {
+            margin-bottom: 16px;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 12px 20px 16px;
+        }
+        
+        .conversion-kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .conversion-kpi-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .conversion-kpi-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .kpi-filter-dropdown {
+            padding: 4px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .kpi-config-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .kpi-config-btn:hover {
+            border-color: #fa8c16;
+            color: #fa8c16;
+        }
+        
+        .kpi-config-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 998;
+        }
+        
+        .kpi-config-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 999;
+            width: 360px;
+        }
+        
+        .kpi-config-header {
+            padding: 16px 20px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .kpi-config-body {
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .kpi-config-option {
+            padding: 6px 14px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        
+        .kpi-config-option:hover {
+            border-color: #fa8c16;
+        }
+        
+        .kpi-config-option.selected {
+            border-color: #fa8c16;
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .kpi-config-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .btn-secondary, .btn-primary {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            color: #666;
+        }
+        
+        .btn-primary {
+            border-color: #fa8c16;
+            background: #fa8c16;
+            color: #fff;
+        }
+        
+        .conversion-kpi-row {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .conversion-kpi {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            border-right: 1px solid #f0f0f0;
+        }
+        
+        .conversion-kpi:last-child {
+            border-right: none;
+        }
+        
+        .conversion-kpi-icon {
+            width: 8px;
+            height: 16px;
+            background: #ff4d4f;
+            border-radius: 2px;
+        }
+        
+        .conversion-kpi-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .conversion-kpi-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .conversion-kpi-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .conversion-content {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .conversion-funnel {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .funnel-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 0;
+        }
+        
+        .funnel-level {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 12px;
+            color: #fff;
+            position: relative;
+            min-height: 70px;
+        }
+        
+        .funnel-level.blue { 
+            background: #5470c6; 
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+        }
+        .funnel-level.green { 
+            background: #2ecc71; 
+            clip-path: polygon(10% 0, 90% 0, 85% 100%, 15% 100%);
+        }
+        .funnel-level.navy { 
+            background: #34495e; 
+            clip-path: polygon(15% 0, 85% 0, 80% 100%, 20% 100%);
+        }
+        .funnel-level.yellow { 
+            background: #f1c40f; 
+            clip-path: polygon(20% 0, 80% 0, 75% 100%, 25% 100%);
+        }
+        
+        .funnel-level-title {
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+        
+        .funnel-level-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .funnel-level-sub {
+            font-size: 10px;
+            margin-top: 2px;
+            opacity: 0.9;
+        }
+        
+        .funnel-rate-box {
+            position: absolute;
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .funnel-rate-box strong {
+            color: #1a1a1a;
+            font-size: 13px;
+        }
+        
+        .funnel-conv-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0;
+            margin: -4px 0;
+            position: relative;
+        }
+        
+        .funnel-conv-arrow {
+            font-size: 10px;
+            color: #bbb;
+        }
+        
+        .funnel-conv-rate {
+            font-size: 11px;
+            color: #fa8c16;
+            font-weight: 500;
+            background: #fff7e6;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #ffe7ba;
+        }
+        
+        .conversion-trend {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .conversion-chart-tooltip {
+            position: absolute;
+            pointer-events: none;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 12px;
+            z-index: 20;
+            white-space: nowrap;
+        }
+        
+        .conversion-chart-tooltip-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1a1a1a;
+            font-size: 12px;
+        }
+        
+        .conversion-chart-tooltip-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+        
+        .conversion-chart-tooltip-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .conversion-chart-tooltip-label {
+            color: #666;
+            flex: 1;
+        }
+        
+        .conversion-chart-tooltip-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .conversion-chart-container {
+            position: relative;
+            height: 220px;
+        }
+        
+        .conversion-chart-tooltip {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 12px;
+            z-index: 10;
+        }
+        
+        .conversion-chart-tooltip-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        
+        .conversion-chart-tooltip-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .conversion-chart-tooltip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .conversion-chart-tooltip-label {
+            color: #666;
+            flex: 1;
+        }
+        
+        .conversion-chart-tooltip-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .conversion-chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .conversion-chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: all .2s;
+        }
+        
+        .conversion-chart-legend-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .conversion-chart-legend-item.hidden {
+            opacity: 0.4;
+        }
+        
+        .conversion-chart-legend-item.hidden span {
+            text-decoration: line-through;
+        }
+        
+        .conversion-chart-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        /* 任务分析 */
+        .task-rank-tabs {
+            display: flex;
+            gap: 4px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 2px;
+        }
+        
+        .task-rank-tab {
+            padding: 4px 14px;
+            font-size: 12px;
+            color: #666;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        
+        .task-rank-tab:hover {
+            color: #fa8c16;
+        }
+        
+        .task-rank-tab.active {
+            background: #fff;
+            color: #fa8c16;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+        
+        .task-rank-count-link {
+            color: #1890ff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .task-rank-count-link:hover {
+            color: #40a9ff;
+        }
+        .data-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .data-table th.sortable:hover {
+            background: #f5f5f5;
+        }
+        .sort-arrow {
+            display: inline-block;
+            margin-left: 2px;
+            font-size: 10px;
+            color: #bbb;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        .sort-arrow.active {
+            color: #fa8c16;
+        }
+        
+        .manager-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 998;
+        }
+        
+        .manager-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 999;
+            width: 480px;
+        }
+        
+        .manager-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .manager-modal-close {
+            width: 28px; height: 28px;
+            border: none;
+            background: none;
+            font-size: 18px;
+            color: #999;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .manager-modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .manager-modal-body {
+            padding: 16px 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .task-overview {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .task-kpi-card {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .task-kpi-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        
+        .task-kpi-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .task-kpi-change {
+            font-size: 11px;
+            color: #ff4d4f;
+            margin-top: 2px;
+        }
+        
+        .task-kpi-change.up {
+            color: #ff4d4f;
+        }
+        
+        .task-kpi-change.down {
+            color: #52c41a;
+        }
+        
+        .task-execution {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .task-execution-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+        
+        .task-channels {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .task-channel {
+            flex: 1;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 16px;
+        }
+        
+        .task-channel-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .task-channel-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .task-channel-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        .task-channel-stat {
+            text-align: center;
+        }
+        
+        .task-channel-stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+        
+        .task-channel-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .task-channel-stat-change {
+            font-size: 10px;
+            color: #ff4d4f;
+        }
+        
+        /* A/B测试分析 */
+        .ab-test-table-wrapper {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .ab-test-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .ab-test-table th, .ab-test-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        
+        .ab-test-table th {
+            background: #fafafa;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .ab-test-table td {
+            color: #333;
+        }
+        
+        .ab-test-table .component-name {
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .ab-test-table .branch-name {
+            color: #4a90d9;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px;
+        }
+        
+        .pagination-btn {
+            padding: 4px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .pagination-btn.active {
+            background: #4a90d9;
+            color: #fff;
+            border-color: #4a90d9;
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .filter-input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+        }
+        
+        .btn-primary {
+            background: #4a90d9;
+            color: #fff;
+            border-color: #4a90d9;
+        }
+        
+        .btn-orange {
+            background: #fa8c16;
+            color: #fff;
+            border-color: #fa8c16;
+        }
+
+        /* 日期范围选择器 */
+        .date-range-picker {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .date-quick-btns {
+            display: flex;
+            gap: 4px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .date-quick-btn {
+            padding: 5px 10px;
+            border: none;
+            background: #fff;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            border-right: 1px solid #e8e8e8;
+            transition: all 0.2s;
+        }
+        
+        .date-quick-btn:last-child {
+            border-right: none;
+        }
+        
+        .date-quick-btn:hover {
+            background: #f0f7ff;
+            color: #4a90d9;
+        }
+        
+        .date-quick-btn.active {
+            background: #4a90d9;
+            color: #fff;
+        }
+        
+        .date-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .date-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .date-cal-icon {
+            position: absolute;
+            left: 8px;
+            pointer-events: none;
+        }
+        
+        .date-input {
+            padding: 6px 8px 6px 26px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        
+        .date-input:focus {
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.1);
+        }
+        
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .data-section {
+                flex-direction: column;
+            }
+            .data-column {
+                border-right: none;
+                border-bottom: 1px solid #f0f0f0;
+                padding: 16px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部活动概览 -->
+    <div class="top-section">
+        <div class="activity-header">
+            <div class="activity-icon">📊</div>
+            <div class="activity-info">
+                <div class="activity-title">存量促活的活动 存量促活-提升AUM</div>
+                <div class="activity-subtitle">活动时间：2020-01-01 07:00:00 ~ 2022-12-31 07:00:00</div>
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <span class="progress-text">20%</span>
+                    <span style="font-size: 12px; color: #666;">已过去1天3小时，剩余2天3小时</span>
+                </div>
+                <div class="activity-meta">
+                    <span>admin</span>
+                    <span>更新于 2020-01-01 07:00:00</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <!-- 整体数据 -->
+            <div class="data-column">
+                <div class="data-column-header">整体数据</div>
+                <div class="kpi-row">
+                    <div class="kpi-item">
+                        <div class="kpi-value">85.21%</div>
+                        <div class="kpi-label">下发成功率</div>
+                        <div class="kpi-sub-value">成功人数 11,792</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-value">72.38%</div>
+                        <div class="kpi-label">执行成功率</div>
+                        <div class="kpi-sub-value">成功人数 5,960</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-value">65.95%</div>
+                        <div class="kpi-label">触达成功率</div>
+                        <div class="kpi-sub-value">成功人数 3,583</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-value">59.70%</div>
+                        <div class="kpi-label">响应成功率</div>
+                        <div class="kpi-sub-value">成功人数 1,936</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 今日数据 -->
+            <div class="data-column">
+                <div class="data-column-header today">今日数据</div>
+                <div class="kpi-row">
+                    <div class="kpi-item">
+                        <div class="kpi-value">35</div>
+                        <div class="kpi-label">新增触达人次</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-value">23</div>
+                        <div class="kpi-label">新增参与活动人数</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-value">12</div>
+                        <div class="kpi-label">新增目标完成人数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主Tab区域 -->
+    <div class="main-tabs">
+        <div class="tab-nav">
+            <div class="tab-item active" data-tab="target">目标分析</div>
+            <div class="tab-item" data-tab="process">过程分析</div>
+            <div class="tab-item" data-tab="channel">渠道分析</div>
+            <div class="tab-item" data-tab="conversion">转化分析</div>
+            <div class="tab-item" data-tab="task">任务分析</div>
+            <div class="tab-item" data-tab="abtest">A/B测试分析</div>
+        </div>
+
+        <!-- 目标分析 -->
+        <div class="tab-content active" id="tab-target">
+            <!-- 活动目标详情面板 -->
+            <div class="goal-detail-panel">
+                <!-- 顶部目标切换Tab -->
+                <div class="goal-tab-bar">
+                    <div class="goal-tab active" data-goal="0" onclick="switchGoalDetail(this, 0)">
+                        <div class="goal-tab-icon">🎯</div>
+                        <div class="goal-tab-text">
+                            <div class="goal-tab-title">总目标</div>
+                            <div class="goal-tab-rate">42.15%</div>
+                            <div class="goal-tab-sub">目标完成率</div>
+                        </div>
+                    </div>
+                    <div class="goal-tab" data-goal="1" onclick="switchGoalDetail(this, 1)">
+                        <div class="goal-tab-icon">📊</div>
+                        <div class="goal-tab-text">
+                            <div class="goal-tab-title">分目标1</div>
+                            <div class="goal-tab-rate">34.89%</div>
+                            <div class="goal-tab-sub">目标完成率</div>
+                        </div>
+                    </div>
+                    <div class="goal-tab" data-goal="2" onclick="switchGoalDetail(this, 2)">
+                        <div class="goal-tab-icon">🎂</div>
+                        <div class="goal-tab-text">
+                            <div class="goal-tab-title">分目标2</div>
+                            <div class="goal-tab-rate">55.00%</div>
+                            <div class="goal-tab-sub">目标完成率</div>
+                        </div>
+                    </div>
+                    <div class="goal-tab" data-goal="3" onclick="switchGoalDetail(this, 3)">
+                        <div class="goal-tab-icon">📱</div>
+                        <div class="goal-tab-text">
+                            <div class="goal-tab-title">分目标3</div>
+                            <div class="goal-tab-rate">62.00%</div>
+                            <div class="goal-tab-sub">目标完成率</div>
+                        </div>
+                    </div>
+                    <div class="goal-tab" data-goal="4" onclick="switchGoalDetail(this, 4)">
+                        <div class="goal-tab-icon">📲</div>
+                        <div class="goal-tab-text">
+                            <div class="goal-tab-title">分目标4</div>
+                            <div class="goal-tab-rate">34.00%</div>
+                            <div class="goal-tab-sub">目标完成率</div>
+                        </div>
+                    </div>
+                    <div class="goal-tab" data-goal="5" onclick="switchGoalDetail(this, 5)">
+                        <div class="goal-tab-icon">🏦</div>
+                        <div class="goal-tab-text">
+                            <div class="goal-tab-title">分目标5</div>
+                            <div class="goal-tab-rate">28.50%</div>
+                            <div class="goal-tab-sub">目标完成率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 目标详情内容区 -->
+                <div class="goal-panel-body" id="goalPanelBody">
+                    <div class="goal-condition-row">
+                        <div class="goal-condition-left">
+                            <div class="goal-condition-line">
+                                <strong>初始条件：</strong>AUM余额&lt;1000 | <strong>提升至：</strong>AUM大于1000 | <strong>目标人数：</strong>50
+                            </div>
+                            <div class="goal-condition-time">认定时间：2025-12-03 14:50:15</div>
+                        </div>
+                        <div class="goal-progress-ring-small">
+                            <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="26" fill="none" stroke="#f0f0f0" stroke-width="6"/>
+                                <circle cx="30" cy="30" r="26" fill="none" stroke="#52c41a" stroke-width="6"
+                                        stroke-dasharray="163.36" stroke-dashoffset="98.02" stroke-linecap="round"
+                                        transform="rotate(-90 30 30)"/>
+                                <text x="30" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#333">40%</text>
+                                <text x="30" y="40" text-anchor="middle" font-size="9" fill="#999">进度</text>
+                            </svg>
+                            <div style="font-size: 11px; color: #999; margin-top: 4px; text-align: center;">20/50</div>
+                        </div>
+                    </div>
+
+                    <div class="goal-customer-cards">
+                        <div class="goal-customer-card green-border">
+                            <div class="goal-customer-card-header">
+                                <div class="goal-customer-card-bar green-bar"></div>
+                                <span class="goal-customer-card-title">完成目标客户</span>
+                                <div class="goal-customer-card-num">
+                                    <span class="goal-customer-value">20人</span>
+                                    <span class="goal-customer-badge green-badge">转化率：40%</span>
+                                </div>
+                            </div>
+                            <div class="goal-customer-metrics">
+                                <div class="goal-customer-metric">
+                                    <div class="metric-label">期初值（万）</div>
+                                    <div class="metric-value">800</div>
+                                </div>
+                                <div class="goal-customer-metric">
+                                    <div class="metric-label">期末值（万）</div>
+                                    <div class="metric-value">1800</div>
+                                </div>
+                                <div class="goal-customer-metric">
+                                    <div class="metric-label">完成值（万）</div>
+                                    <div class="metric-value">1800</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goal-customer-card orange-border">
+                            <div class="goal-customer-card-header">
+                                <div class="goal-customer-card-bar orange-bar"></div>
+                                <span class="goal-customer-card-title">渠道响应客户</span>
+                                <div class="goal-customer-card-num">
+                                    <span class="goal-customer-value">35人</span>
+                                </div>
+                            </div>
+                            <div class="goal-customer-metrics">
+                                <div class="goal-customer-metric">
+                                    <div class="metric-label">期初值（万）</div>
+                                    <div class="metric-value">800</div>
+                                </div>
+                                <div class="goal-customer-metric">
+                                    <div class="metric-label">期末值（万）</div>
+                                    <div class="metric-value">1800</div>
+                                </div>
+                                <div class="goal-customer-metric">
+                                    <div class="metric-label">完成值（万）</div>
+                                    <div class="metric-value">1800</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 目标趋势 -->
+            <div class="chart-section" style="margin-bottom: 20px;">
+                <div class="chart-header">
+                    <div class="section-title-text">目标趋势</div>
+                    <div class="date-range-picker">
+                        <div class="date-quick-btns">
+                            <button class="date-quick-btn" onclick="setDateRange('today')">今天</button>
+                            <button class="date-quick-btn active" onclick="setDateRange('7d')">近7天</button>
+                            <button class="date-quick-btn" onclick="setDateRange('30d')">近30天</button>
+                            <button class="date-quick-btn" onclick="setDateRange('month')">本月</button>
+                        </div>
+                        <div class="date-inputs">
+                            <div class="date-input-group">
+                                <svg class="date-cal-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <input type="date" class="date-input" value="2025-11-28" id="startDate" onchange="updateDateRange()">
+                            </div>
+                            <span style="color: #999; font-size: 13px;">~</span>
+                            <div class="date-input-group">
+                                <svg class="date-cal-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <input type="date" class="date-input" value="2025-12-03" id="endDate" onchange="updateDateRange()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-tabs">
+                    <button class="chart-tab active">目标达成趋势</button>
+                    <button class="chart-tab">营销成功趋势</button>
+                    <button class="chart-tab">目标达成率趋势</button>
+                </div>
+                <div class="chart-container" id="goalTrendChart">
+                    <svg width="600" height="200" viewBox="0 0 600 200">
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#722ed1"/>
+                                <stop offset="100%" style="stop-color:#1890ff"/>
+                            </linearGradient>
+                        </defs>
+                        <line x1="50" y1="20" x2="50" y2="160" stroke="#e8e8e8" stroke-width="1"/>
+                        <line x1="50" y1="160" x2="570" y2="160" stroke="#e8e8e8" stroke-width="1"/>
+                        <text x="10" y="164" font-size="10" fill="#999" text-anchor="end">0</text>
+                        <text x="10" y="104" font-size="10" fill="#999" text-anchor="end">500</text>
+                        <text x="10" y="44" font-size="10" fill="#999" text-anchor="end">1000</text>
+                        <path d="M 50 150 Q 150 120, 250 100 T 450 80 T 550 60" 
+                              fill="none" stroke="url(#lineGradient)" stroke-width="3"/>
+                        <circle cx="50" cy="150" r="4" fill="#722ed1"/>
+                        <circle cx="150" cy="120" r="4" fill="#722ed1"/>
+                        <circle cx="250" cy="100" r="4" fill="#722ed1"/>
+                        <circle cx="350" cy="90" r="4" fill="#722ed1"/>
+                        <circle cx="450" cy="80" r="4" fill="#1890ff"/>
+                        <circle cx="550" cy="60" r="4" fill="#1890ff"/>
+                        <text x="50" y="175" font-size="10" fill="#999" text-anchor="middle">11/28</text>
+                        <text x="150" y="175" font-size="10" fill="#999" text-anchor="middle">11/29</text>
+                        <text x="250" y="175" font-size="10" fill="#999" text-anchor="middle">11/30</text>
+                        <text x="350" y="175" font-size="10" fill="#999" text-anchor="middle">12/01</text>
+                        <text x="450" y="175" font-size="10" fill="#999" text-anchor="middle">12/02</text>
+                        <text x="550" y="175" font-size="10" fill="#999" text-anchor="middle">12/03</text>
+                    </svg>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #bfbfbf;"></div>
+                        <span>日新增达成人数</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #722ed1;"></div>
+                        <span>累计达成人数</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #1890ff;"></div>
+                        <span>目标基准线</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 目标效果统计 -->
+            <div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                <div class="section-title">
+                    <div class="section-title-text">目标效果统计</div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>新增目标完成人数</th>
+                            <th>新增目标完成率</th>
+                            <th>累计营销成功率</th>
+                            <th>累计目标完成率</th>
+                            <th>累计目标完成人数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goalStatsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 过程分析 -->
+        <div class="tab-content" id="tab-process">
+            <div class="flow-container">
+                <div class="flow-canvas">
+                    <!-- 开始 -->
+                    <div class="flow-node" onclick="showStrategyPanel()">
+                        <div class="flow-node-icon green">▶</div>
+                        <div class="flow-node-label">开始</div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    
+                    <!-- 客群名单 -->
+                    <div class="flow-node">
+                        <div class="flow-node-icon blue">👥</div>
+                        <div class="flow-node-label">客群_名单</div>
+                        <div class="flow-node-sub">名单名称名单</div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    
+                    <!-- 权益 -->
+                    <div class="flow-node">
+                        <div class="flow-node-icon orange">🎁</div>
+                        <div class="flow-node-label">资源_权益</div>
+                        <div class="flow-node-sub">权益名称</div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    
+                    <!-- 分支组件 -->
+                    <div class="flow-branch">
+                        <div class="flow-branch-item">
+                            <div class="flow-node" onclick="showComponentModal()">
+                                <div class="flow-node-icon orange">📋</div>
+                                <div class="flow-node-label">渠道_短信</div>
+                                <div class="flow-node-sub">渠道名称</div>
+                            </div>
+                        </div>
+                        <div class="flow-branch-item">
+                            <div class="flow-node">
+                                <div class="flow-node-icon cyan">📍</div>
+                                <div class="flow-node-label">渠道_地推</div>
+                                <div class="flow-node-sub">渠道名称</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    
+                    <!-- 策略B -->
+                    <div class="flow-node">
+                        <div class="flow-node-icon gray">⏱</div>
+                        <div class="flow-node-label">时机</div>
+                        <div class="flow-node-sub">等待某个</div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    
+                    <!-- 结束 -->
+                    <div class="flow-node" onclick="showStrategyPanel()">
+                        <div class="flow-node-icon red">■</div>
+                        <div class="flow-node-label">结束</div>
+                    </div>
+                </div>
+                
+                <!-- 策略弹板 -->
+                <div class="strategy-panel" id="strategyPanel" style="display: none;">
+                    <div class="strategy-panel-header">
+                        <span class="strategy-panel-title">策略</span>
+                        <button class="strategy-panel-close" onclick="hideStrategyPanel()">×</button>
+                    </div>
+                    <div class="strategy-panel-content">
+                        <div class="strategy-info-item">
+                            <span class="strategy-info-label">来源ID</span>
+                            <span class="strategy-info-value">022023902390003</span>
+                        </div>
+                        <div class="strategy-info-item">
+                            <span class="strategy-info-label">流入客户</span>
+                            <span class="strategy-info-value clickable" onclick="showCustomerModal('inflow')">8823</span>
+                        </div>
+                        <div class="strategy-info-item">
+                            <span class="strategy-info-label">流出客户</span>
+                            <span class="strategy-info-value clickable" onclick="showCustomerModal('outflow')">2071</span>
+                        </div>
+                        <div class="strategy-info-item">
+                            <span class="strategy-info-label">漏损客户</span>
+                            <span class="strategy-info-value clickable" onclick="showCustomerModal('leakage')">3710</span>
+                        </div>
+                        <div class="strategy-info-item">
+                            <span class="strategy-info-label">组件数</span>
+                            <span class="strategy-info-value">5</span>
+                        </div>
+                    </div>
+                    <div class="strategy-panel-footer">
+                        <span style="font-size: 12px; color: #999;">1/3</span>
+                        <div>
+                            <button class="strategy-panel-btn">上一条</button>
+                            <button class="strategy-panel-btn primary">下一条</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 渠道分析 -->
+        <div class="tab-content" id="tab-channel">
+            <!-- 渠道概览 -->
+            <div class="channel-overview">
+                <div class="channel-pie-section">
+                    <div class="channel-pie-header">
+                        <span class="channel-pie-title">渠道占比</span>
+                        <select class="channel-filter-dropdown" id="channelPieFilter" onchange="updateChannelPie()">
+                            <option value="issued">下发情况</option>
+                            <option value="executed">执行情况</option>
+                            <option value="reached">触达情况</option>
+                            <option value="responded">响应情况</option>
+                        </select>
+                    </div>
+                    <div class="channel-pie-chart">
+                        <svg width="180" height="180" viewBox="0 0 180 180" id="channelPieSvg">
+                        </svg>
+                        <div class="channel-pie-center">
+                            <div class="channel-pie-value" id="channelPieTotal">3200</div>
+                            <div class="channel-pie-label" id="channelPieLabel">执行总数</div>
+                        </div>
+                    </div>
+                    <div class="channel-pie-legend" id="channelPieLegend">
+                    </div>
+                </div>
+                
+                <div class="channel-ranking-card">
+                    <div class="channel-ranking-header">
+                        <span class="channel-ranking-title">人工渠道排名</span>
+                        <select class="channel-filter-dropdown" onchange="updateManualRank(this.value)">
+                            <option value="executed">执行情况</option>
+                            <option value="issued">下发情况</option>
+                            <option value="reached">触达情况</option>
+                            <option value="responded">响应情况</option>
+                        </select>
+                    </div>
+                    <div class="channel-ranking-list" id="manualRankList">
+                    </div>
+                </div>
+                
+                <div class="channel-ranking-card">
+                    <div class="channel-ranking-header">
+                        <span class="channel-ranking-title">对客渠道排名</span>
+                        <select class="channel-filter-dropdown" onchange="updateCustomerRank(this.value)">
+                            <option value="executed">执行情况</option>
+                            <option value="issued">下发情况</option>
+                            <option value="reached">触达情况</option>
+                            <option value="responded">响应情况</option>
+                        </select>
+                    </div>
+                    <div class="channel-ranking-list" id="customerRankList">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 渠道数量明细Tab -->
+            <div class="channel-tabs">
+                <div class="channel-tab active">短信渠道数量</div>
+                <div class="channel-tab">APP-PUSH渠道数量</div>
+                <div class="channel-tab">掌银APP渠道数量</div>
+                <div class="channel-tab">电销平台渠道数量</div>
+                <div class="channel-tab">智能外呼渠道数量</div>
+                <div class="channel-tab">企业微信渠道数量</div>
+            </div>
+            
+            <div class="channel-metric-cards">
+                <div class="channel-metric-card active">
+                    <div class="channel-metric-label">短信渠道数量</div>
+                    <div class="channel-metric-value">2</div>
+                    <div class="channel-metric-sub">客户数 2349</div>
+                </div>
+                <div class="channel-metric-card">
+                    <div class="channel-metric-label">APP-PUSH渠道数量</div>
+                    <div class="channel-metric-value">7</div>
+                    <div class="channel-metric-sub">客户数 24%</div>
+                </div>
+                <div class="channel-metric-card">
+                    <div class="channel-metric-label">掌银APP渠道数量</div>
+                    <div class="channel-metric-value">11</div>
+                    <div class="channel-metric-sub">客户数 429</div>
+                </div>
+                <div class="channel-metric-card">
+                    <div class="channel-metric-label">电销平台渠道数量</div>
+                    <div class="channel-metric-value">8</div>
+                    <div class="channel-metric-sub">客户数 200</div>
+                </div>
+                <div class="channel-metric-card">
+                    <div class="channel-metric-label">智能外呼渠道数量</div>
+                    <div class="channel-metric-value">8</div>
+                    <div class="channel-metric-sub">客户数 442</div>
+                </div>
+                <div class="channel-metric-card">
+                    <div class="channel-metric-label">企业微信渠道数量</div>
+                    <div class="channel-metric-value">3</div>
+                    <div class="channel-metric-sub">客户数 2106</div>
+                </div>
+            </div>
+
+            <!-- 渠道明细表 -->
+            <div class="toolbar">
+                <div class="filter-group">
+                    <select class="filter-input">
+                        <option>节点名称</option>
+                    </select>
+                    <select class="filter-input">
+                        <option>渠道目标名称</option>
+                    </select>
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn">重置</button>
+                </div>
+                <button class="btn">导出</button>
+            </div>
+            
+            <div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden;">
+                <table class="data-table" style="margin: 0;">
+                    <thead>
+                        <tr>
+                            <th>节点名称</th>
+                            <th>目标名称</th>
+                            <th>下发数</th>
+                            <th>实发数</th>
+                            <th>执行数</th>
+                            <th>响应数</th>
+                            <th>成功数</th>
+                            <th>执行成功率</th>
+                            <th>成功率</th>
+                            <th>自然成功率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>9656</td>
+                            <td>达涛</td>
+                            <td>3686</td>
+                            <td>753</td>
+                            <td>756</td>
+                            <td>801</td>
+                            <td>945</td>
+                            <td>88.55%</td>
+                            <td>70.54%</td>
+                            <td>16.73%</td>
+                        </tr>
+                        <tr>
+                            <td>8565</td>
+                            <td>代瑶</td>
+                            <td>1773</td>
+                            <td>185</td>
+                            <td>448</td>
+                            <td>857</td>
+                            <td>611</td>
+                            <td>70.47%</td>
+                            <td>83.93%</td>
+                            <td>21.52%</td>
+                        </tr>
+                        <tr>
+                            <td>1928</td>
+                            <td>晓光</td>
+                            <td>2057</td>
+                            <td>801</td>
+                            <td>813</td>
+                            <td>474</td>
+                            <td>168</td>
+                            <td>35.75%</td>
+                            <td>75.92%</td>
+                            <td>82.71%</td>
+                        </tr>
+                        <tr>
+                            <td>4181</td>
+                            <td>李军婵</td>
+                            <td>4558</td>
+                            <td>553</td>
+                            <td>447</td>
+                            <td>598</td>
+                            <td>571</td>
+                            <td>95.2%</td>
+                            <td>26.27%</td>
+                            <td>69.68%</td>
+                        </tr>
+                        <tr>
+                            <td>0061</td>
+                            <td>董伟</td>
+                            <td>1216</td>
+                            <td>703</td>
+                            <td>726</td>
+                            <td>390</td>
+                            <td>130</td>
+                            <td>45.68%</td>
+                            <td>68.27%</td>
+                            <td>63.52%</td>
+                        </tr>
+                        <tr>
+                            <td>7747</td>
+                            <td>许望达</td>
+                            <td>7251</td>
+                            <td>430</td>
+                            <td>441</td>
+                            <td>972</td>
+                            <td>152</td>
+                            <td>64.98%</td>
+                            <td>29.13%</td>
+                            <td>75.75%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 渠道成功率排名 -->
+            <div style="margin-top: 20px;">
+                <div class="section-title">
+                    <div class="section-title-text">渠道成功率排名</div>
+                    <div class="section-subtitle">以渠道成功率进行排行：成功率、客户数、执行数、成功数</div>
+                </div>
+                <div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden;">
+                    <table class="data-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>渠道</th>
+                                <th>成功率</th>
+                                <th>客户数</th>
+                                <th>执行数</th>
+                                <th>成功数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="display: inline-flex; width: 24px; height: 24px; background: #ff4d4f; color: #fff; border-radius: 50%; align-items: center; justify-content: center; font-weight: 600;">1</span></td>
+                                <td>上门拜访</td>
+                                <td style="color: #ff4d4f; font-weight: 600;">68.0%</td>
+                                <td>3,200</td>
+                                <td>3,200</td>
+                                <td>1,280</td>
+                            </tr>
+                            <tr>
+                                <td><span style="display: inline-flex; width: 24px; height: 24px; background: #ff7a45; color: #fff; border-radius: 50%; align-items: center; justify-content: center; font-weight: 600;">2</span></td>
+                                <td>电话外呼</td>
+                                <td style="color: #ff7a45; font-weight: 600;">72.0%</td>
+                                <td>12,480</td>
+                                <td>12,480</td>
+                                <td>2,340</td>
+                            </tr>
+                            <tr>
+                                <td><span style="display: inline-flex; width: 24px; height: 24px; background: #faad14; color: #fff; border-radius: 50%; align-items: center; justify-content: center; font-weight: 600;">3</span></td>
+                                <td>网点大堂</td>
+                                <td style="color: #faad14; font-weight: 600;">55.0%</td>
+                                <td>6,840</td>
+                                <td>6,840</td>
+                                <td>960</td>
+                            </tr>
+                            <tr>
+                                <td><span style="display: inline-flex; width: 24px; height: 24px; background: #d9d9d9; color: #666; border-radius: 50%; align-items: center; justify-content: center; font-weight: 600;">4</span></td>
+                                <td>手机银行Push</td>
+                                <td>27.0%</td>
+                                <td>9,860</td>
+                                <td>9,860</td>
+                                <td>1,330</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 转化分析 -->
+        <div class="tab-content" id="tab-conversion">
+            <!-- KPI 配置弹窗 -->
+            <div class="kpi-config-overlay" id="kpiConfigOverlay" style="display:none;" onclick="hideKpiConfig()"></div>
+            <div class="kpi-config-panel" id="kpiConfigPanel" style="display:none;">
+                <div class="kpi-config-header">选择展示指标 <span style="font-size:11px;color:#999;">(最多4个)</span></div>
+                <div class="kpi-config-body" id="kpiConfigBody"></div>
+                <div class="kpi-config-footer">
+                    <button class="btn-secondary" onclick="hideKpiConfig()">取消</button>
+                    <button class="btn-primary" onclick="saveKpiConfig()">确定</button>
+                </div>
+            </div>
+
+            <div class="conversion-overview">
+                <div class="conversion-kpi-header">
+                    <span class="conversion-kpi-section-title">转化指标</span>
+                    <div class="conversion-kpi-tools">
+                        <select class="kpi-filter-dropdown" id="kpiFilterSelect" onchange="filterKpiMetric()">
+                            <option value="all">全部</option>
+                            <option value="issued">下发</option>
+                            <option value="unissued">未下发</option>
+                            <option value="executed">执行</option>
+                            <option value="unexecuted">未执行</option>
+                            <option value="reached">触达</option>
+                            <option value="unreached">未触达</option>
+                            <option value="responded">响应</option>
+                            <option value="unresponded">未响应</option>
+                        </select>
+                        <button class="kpi-config-btn" onclick="toggleKpiConfig()" title="配置指标">⚙</button>
+                    </div>
+                </div>
+                <div class="conversion-kpi-row" id="conversionKpiRow">
+                </div>
+            </div>
+            
+            <div class="conversion-content">
+                <div class="conversion-funnel">
+                    <div class="conversion-section-title">客户转化分析</div>
+                    <div class="funnel-chart" id="funnelChart">
+                    </div>
+                </div>
+                
+                <div class="conversion-trend">
+                    <div class="conversion-section-title">任务执行趋势</div>
+                    <div class="conversion-chart-container" id="conversionChartContainer" onmousemove="showTrendTooltip(event)" onmouseleave="hideTrendTooltip()">
+                    </div>
+                    <div class="conversion-chart-tooltip" id="conversionTrendTooltip" style="display:none;"></div>
+                    <div class="conversion-chart-legend" id="conversionChartLegend">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务分析 -->
+        <div class="tab-content" id="tab-task">
+            <!-- 任务情况 -->
+            <div class="task-overview">
+                <div class="task-kpi-card">
+                    <div class="task-kpi-value">4839</div>
+                    <div class="task-kpi-label">累计发布任务数</div>
+                    <div class="task-kpi-change up">比昨日 25.84% ↑</div>
+                </div>
+                <div class="task-kpi-card">
+                    <div class="task-kpi-value">4839</div>
+                    <div class="task-kpi-label">未分配任务数</div>
+                    <div class="task-kpi-change down">比昨日 19.27% ↓</div>
+                </div>
+                <div class="task-kpi-card">
+                    <div class="task-kpi-value">4839</div>
+                    <div class="task-kpi-label">执行任务数</div>
+                    <div class="task-kpi-change up">比昨日 23.79% ↑</div>
+                </div>
+                <div class="task-kpi-card">
+                    <div class="task-kpi-value">4839</div>
+                    <div class="task-kpi-label">未执行任务数</div>
+                    <div class="task-kpi-change down">比昨日 3.76% ↓</div>
+                </div>
+                <div class="task-kpi-card">
+                    <div class="task-kpi-value">4839</div>
+                    <div class="task-kpi-label">任务响应数</div>
+                    <div class="task-kpi-change down">比昨日 1.79% ↓</div>
+                </div>
+                <div class="task-kpi-card">
+                    <div class="task-kpi-value">4839</div>
+                    <div class="task-kpi-label">任务未响应数</div>
+                    <div class="task-kpi-change up">比昨日 29.29% ↑</div>
+                </div>
+            </div>
+            
+            <!-- 执行情况 -->
+            <div class="task-execution">
+                <div class="task-execution-title">执行情况</div>
+                <div class="task-channels">
+                    <div class="task-channel">
+                        <div class="task-channel-header">
+                            <div class="task-channel-icon" style="background: #fff7e6; color: #fa8c16;">📱</div>
+                            <span>掌银APP</span>
+                        </div>
+                        <div class="task-channel-stats">
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式1</div>
+                                <div class="task-channel-stat-value">40</div>
+                                <div class="task-channel-stat-change">比昨日 35</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式2</div>
+                                <div class="task-channel-stat-value">50</div>
+                                <div class="task-channel-stat-change">比昨日 20</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式3</div>
+                                <div class="task-channel-stat-value">66</div>
+                                <div class="task-channel-stat-change">比昨日 38</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式4</div>
+                                <div class="task-channel-stat-value">10</div>
+                                <div class="task-channel-stat-change">比昨日 +</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式5</div>
+                                <div class="task-channel-stat-value">179</div>
+                                <div class="task-channel-stat-change">比昨日 93</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-channel">
+                        <div class="task-channel-header">
+                            <div class="task-channel-icon" style="background: #e6f7ff; color: #1890ff;">💬</div>
+                            <span>企业微信</span>
+                        </div>
+                        <div class="task-channel-stats">
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式1</div>
+                                <div class="task-channel-stat-value">232</div>
+                                <div class="task-channel-stat-change">比昨日 100</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式2</div>
+                                <div class="task-channel-stat-value">146</div>
+                                <div class="task-channel-stat-change">比昨日 76</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式3</div>
+                                <div class="task-channel-stat-value">423</div>
+                                <div class="task-channel-stat-change">比昨日 212</div>
+                            </div>
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式4</div>
+                                <div class="task-channel-stat-value">323</div>
+                                <div class="task-channel-stat-change">比昨日 156</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-channel">
+                        <div class="task-channel-header">
+                            <div class="task-channel-icon" style="background: #f6ffed; color: #52c41a;">📞</div>
+                            <span>电销平台</span>
+                        </div>
+                        <div class="task-channel-stats">
+                            <div class="task-channel-stat">
+                                <div class="task-channel-stat-label">跟进方式1</div>
+                                <div class="task-channel-stat-value">1256</div>
+                                <div class="task-channel-stat-change">比昨日 656</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 营销任务排名 -->
+            <div>
+                <div class="section-title">
+                    <div class="section-title-text">营销任务排名</div>
+                    <div class="task-rank-tabs">
+                        <span class="task-rank-tab active" data-dim="executor" onclick="switchTaskRankDim('executor')">按执行人</span>
+                        <span class="task-rank-tab" data-dim="org" onclick="switchTaskRankDim('org')">按执行机构</span>
+                    </div>
+                </div>
+                <div class="toolbar">
+                    <div class="filter-group" id="taskRankFilters">
+                    </div>
+                    <button class="btn">导出</button>
+                </div>
+                <div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden;">
+                    <table class="data-table" style="margin: 0;">
+                        <thead id="taskRankTableHead">
+                        </thead>
+                        <tbody id="taskRankTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button class="pagination-btn">&lt;</button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">4</button>
+                    <button class="pagination-btn">...</button>
+                    <button class="pagination-btn">30</button>
+                    <button class="pagination-btn">&gt;</button>
+                    <span style="font-size: 12px; color: #666;">10条/页</span>
+                </div>
+            </div>
+            
+            <!-- 客户经理弹窗 -->
+            <div class="manager-modal-overlay" id="managerModalOverlay" style="display:none;" onclick="hideManagerModal()"></div>
+            <div class="manager-modal" id="managerModal" style="display:none;">
+                <div class="manager-modal-header">
+                    <span id="managerModalTitle">客户经理列表</span>
+                    <button class="manager-modal-close" onclick="hideManagerModal()">×</button>
+                </div>
+                <div class="manager-modal-body">
+                    <table class="data-table" style="margin:0;">
+                        <thead>
+                            <tr><th>工号</th><th>客户经理姓名</th></tr>
+                        </thead>
+                        <tbody id="managerModalBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- A/B测试分析 -->
+        <div class="tab-content" id="tab-abtest">
+            <div class="ab-test-table-wrapper">
+                <table class="ab-test-table">
+                    <thead>
+                        <tr>
+                            <th>A/B test组件名称</th>
+                            <th>累计覆盖人数</th>
+                            <th>累计触达人数</th>
+                            <th>累计转化人数</th>
+                            <th>test分支</th>
+                            <th>分支计划覆盖样本数/率</th>
+                            <th>分支实际覆盖样本人数</th>
+                            <th>分支触达率</th>
+                            <th>分支响应率</th>
+                            <th>分支转化率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="5" class="component-name">红包活动</td>
+                            <td rowspan="5">180</td>
+                            <td rowspan="5">19</td>
+                            <td rowspan="5">34</td>
+                            <td class="branch-name">APP-PUSH</td>
+                            <td>25.28%</td>
+                            <td>49</td>
+                            <td>3.38%</td>
+                            <td>17.78%</td>
+                            <td>33.88%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">智能电呼</td>
+                            <td>27.15%</td>
+                            <td>13</td>
+                            <td>91.8%</td>
+                            <td>1.83%</td>
+                            <td>99.89%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">营销APP-面访</td>
+                            <td>0.40%</td>
+                            <td>55</td>
+                            <td>59.39%</td>
+                            <td>74.95%</td>
+                            <td>45.79%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">营销APP-电访</td>
+                            <td>33.83%</td>
+                            <td>19</td>
+                            <td>8.88%</td>
+                            <td>96.36%</td>
+                            <td>70.78%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">APP-PUSH</td>
+                            <td>8.31%</td>
+                            <td>38</td>
+                            <td>28.14%</td>
+                            <td>72.53%</td>
+                            <td>79.31%</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" class="component-name">理财讲座</td>
+                            <td rowspan="2">162</td>
+                            <td rowspan="2">67</td>
+                            <td rowspan="2">56</td>
+                            <td class="branch-name">智能电呼</td>
+                            <td>58.77%</td>
+                            <td>89</td>
+                            <td>90.70%</td>
+                            <td>76.93%</td>
+                            <td>53.98%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">营销APP-面访</td>
+                            <td>11.17%</td>
+                            <td>61</td>
+                            <td>63.93%</td>
+                            <td>46.13%</td>
+                            <td>33.9%</td>
+                        </tr>
+                        <tr>
+                            <td class="component-name">特惠季</td>
+                            <td>399</td>
+                            <td>93</td>
+                            <td>17</td>
+                            <td class="branch-name">营销APP-电访</td>
+                            <td>13.86%</td>
+                            <td>94</td>
+                            <td>88.83%</td>
+                            <td>89.4%</td>
+                            <td>71.81%</td>
+                        </tr>
+                        <tr>
+                            <td class="component-name">投资理财积分兑换</td>
+                            <td>218</td>
+                            <td>44</td>
+                            <td>62</td>
+                            <td class="branch-name">APP-PUSH</td>
+                            <td>22.13%</td>
+                            <td>60</td>
+                            <td>56.54%</td>
+                            <td>40.80%</td>
+                            <td>97.67%</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" class="component-name">黄金投资组合</td>
+                            <td rowspan="2">889</td>
+                            <td rowspan="2">95</td>
+                            <td rowspan="2">63</td>
+                            <td class="branch-name">智能电呼</td>
+                            <td>40.30%</td>
+                            <td>73</td>
+                            <td>38.23%</td>
+                            <td>30.46%</td>
+                            <td>24.96%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">营销APP-面访</td>
+                            <td>27.62%</td>
+                            <td>97</td>
+                            <td>1.20%</td>
+                            <td>55.58%</td>
+                            <td>52.53%</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" class="component-name">保险产品优惠购</td>
+                            <td rowspan="2">480</td>
+                            <td rowspan="2">63</td>
+                            <td rowspan="2">18</td>
+                            <td class="branch-name">营销APP-电访</td>
+                            <td>3.87%</td>
+                            <td>97</td>
+                            <td>26.74%</td>
+                            <td>74.50%</td>
+                            <td>8.15%</td>
+                        </tr>
+                        <tr>
+                            <td class="branch-name">APP-PUSH</td>
+                            <td>26.74%</td>
+                            <td>97</td>
+                            <td>74.50%</td>
+                            <td>8.15%</td>
+                            <td>26.74%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 组件抽屉 -->
+    <div class="component-modal-overlay" id="componentModalOverlay" style="display: none;" onclick="hideComponentDrawer()"></div>
+    
+    <div class="component-modal" id="componentModal" style="display: none;">
+        <div class="component-modal-header">
+            <div class="component-modal-tabs">
+                <span class="component-modal-tab" onclick="switchComponentTab('config')">配置信息</span>
+                <span class="component-modal-tab active" onclick="switchComponentTab('flow')">流转信息</span>
+            </div>
+            <button class="strategy-panel-close" onclick="hideComponentDrawer()">×</button>
+        </div>
+        <div class="component-modal-content">
+            <div id="componentTabConfig" style="display: none;">
+                <div class="component-stat-row">
+                    <span class="component-stat-label">组件名称</span>
+                    <span class="component-stat-value">渠道_短信</span>
+                </div>
+                <div class="component-stat-row">
+                    <span class="component-stat-label">渠道类型</span>
+                    <span class="component-stat-value">短信</span>
+                </div>
+                <div class="component-stat-row">
+                    <span class="component-stat-label">模板ID</span>
+                    <span class="component-stat-value">TMP20231200001</span>
+                </div>
+                <div class="component-stat-row">
+                    <span class="component-stat-label">创建时间</span>
+                    <span class="component-stat-value">2025-12-01 10:00</span>
+                </div>
+            </div>
+            <div id="componentTabFlow">
+                <div style="font-size: 12px; color: #fa8c16; margin-bottom: 12px;">下发客户 180</div>
+            <div class="component-stat-row">
+                <span class="component-stat-label">下发客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('issued')">180</span>
+            </div>
+            <div class="component-stat-row">
+                <span class="component-stat-label">未下发客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('unissued')">40</span>
+            </div>
+            <div class="component-stat-row">
+                <span class="component-stat-label">执行客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('executed')">130</span>
+            </div>
+            <div class="component-stat-row">
+                <span class="component-stat-label">未执行客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('unexecuted')">50</span>
+            </div>
+            <div class="component-stat-row">
+                <span class="component-stat-label">触达客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('reached')">100</span>
+            </div>
+            <div class="component-stat-row">
+                <span class="component-stat-label">未触达客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('unreached')">30</span>
+            </div>
+            <div class="component-stat-row" style="background: #fff7e6; margin: 8px -16px; padding: 10px 16px;">
+                <span class="component-stat-label">响应客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('responded')">70</span>
+            </div>
+            <div class="component-stat-row" style="background: #fff7e6; margin: 0 -16px; padding: 10px 16px;">
+                <span class="component-stat-label">未响应客户</span>
+                <span class="component-stat-value clickable" onclick="showCustomerModal('unresponded')">30</span>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客户明细弹窗 -->
+    <div class="customer-modal-overlay" id="customerModalOverlay" style="display: none;" onclick="hideCustomerModal()"></div>
+    <div class="customer-modal" id="customerModal" style="display: none;">
+        <div class="customer-modal-header">
+            <div class="customer-modal-tabs" id="customerModalTabs">
+                <!-- 动态渲染 -->
+            </div>
+            <button class="customer-modal-close" onclick="hideCustomerModal()">×</button>
+        </div>
+        <div class="customer-modal-body">
+            <div class="customer-toolbar">
+                <div class="customer-toolbar-left">
+                    <button class="btn btn-primary btn-sm" onclick="customerSelectAll(true)">全部加入客户群组</button>
+                    <button class="btn btn-outline btn-sm" onclick="customerAddToGroup()">加入客户群组</button>
+                    <button class="btn btn-outline btn-sm" onclick="customerExport()">导出</button>
+                </div>
+                <div class="customer-toolbar-right">
+                    <input type="text" class="customer-search-input" placeholder="请输入客户号搜索" id="customerSearchInput" oninput="customerSearch()">
+                </div>
+            </div>
+            <table class="customer-table" id="customerTable">
+                <thead id="customerTableHead">
+                </thead>
+                <tbody id="customerTableBody">
+                </tbody>
+            </table>
+            <div class="customer-selected-info" id="customerSelectedInfo" style="display:none;">
+                已选择 <span id="customerSelectedCount">0</span> 条记录
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 日期范围选择器
+        function setDateRange(range) {
+            document.querySelectorAll('.date-quick-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const today = new Date();
+            const endInput = document.getElementById('endDate');
+            const startInput = document.getElementById('startDate');
+            
+            let start = new Date(today);
+            
+            switch(range) {
+                case 'today':
+                    start = new Date(today);
+                    break;
+                case '7d':
+                    start.setDate(today.getDate() - 6);
+                    break;
+                case '30d':
+                    start.setDate(today.getDate() - 29);
+                    break;
+                case 'month':
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+            }
+            
+            const formatDate = (d) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return y + '-' + m + '-' + day;
+            };
+            
+            startInput.value = formatDate(start);
+            endInput.value = formatDate(today);
+        }
+        
+        function updateDateRange() {
+            document.querySelectorAll('.date-quick-btn').forEach(b => b.classList.remove('active'));
+        }
+        
+        // 活动目标面板切换
+        const goalData = {
+            0: {
+                condition: '全部活动客户 | 综合目标达标 | 目标人数：500',
+                time: '2025-12-03 14:50:15',
+                progress: '42',
+                complete: '210/500',
+                completeClients: '210人',
+                convertRate: '42.15%',
+                responseClients: '312人',
+                initialValue: '5000',
+                endValue: '12000',
+                finalValue: '11800'
+            },
+            1: {
+                condition: 'AUM余额&lt;1000 | 提升至：AUM大于1000 | 目标人数：50',
+                time: '2025-12-03 14:50:15',
+                progress: '40',
+                complete: '20/50',
+                completeClients: '20人',
+                convertRate: '40%',
+                responseClients: '35人',
+                initialValue: '800',
+                endValue: '1800',
+                finalValue: '1800'
+            },
+            2: {
+                condition: '客户生日当月 | 提升至：购买理财产品≥1次 | 目标人数：80',
+                time: '2025-12-03 14:50:15',
+                progress: '55',
+                complete: '44/80',
+                completeClients: '44人',
+                convertRate: '55%',
+                responseClients: '66人',
+                initialValue: '1200',
+                endValue: '2500',
+                finalValue: '2500'
+            },
+            3: {
+                condition: '近30天APP活跃 | 提升至：APP-PUSH点击≥3次 | 目标人数：120',
+                time: '2025-12-03 14:50:15',
+                progress: '62',
+                complete: '74/120',
+                completeClients: '74人',
+                convertRate: '62%',
+                responseClients: '98人',
+                initialValue: '600',
+                endValue: '1500',
+                finalValue: '1500'
+            },
+            4: {
+                condition: '掌银APP登录用户 | 提升至：掌银交易≥1笔 | 目标人数：200',
+                time: '2025-12-03 14:50:15',
+                progress: '34',
+                complete: '68/200',
+                completeClients: '68人',
+                convertRate: '34%',
+                responseClients: '112人',
+                initialValue: '1500',
+                endValue: '3200',
+                finalValue: '3200'
+            },
+            5: {
+                condition: '信用卡未激活客户 | 提升至：首刷≥500元 | 目标人数：100',
+                time: '2025-12-03 14:50:15',
+                progress: '28',
+                complete: '28/100',
+                completeClients: '28人',
+                convertRate: '28.5%',
+                responseClients: '45人',
+                initialValue: '300',
+                endValue: '800',
+                finalValue: '750'
+            }
+        };
+        
+        const goalTrendData = {
+            0: { points: [310, 280, 260, 245, 225, 210], dailyNew: [25, 28, 32, 30, 22, 18] },
+            1: { points: [150, 140, 130, 120, 110, 100], dailyNew: [10, 10, 10, 10, 12, 15] },
+            2: { points: [180, 160, 145, 128, 115, 100], dailyNew: [15, 18, 22, 20, 16, 12] },
+            3: { points: [120, 110, 100, 90, 85, 80], dailyNew: [12, 14, 18, 16, 10, 8] },
+            4: { points: [200, 180, 165, 152, 140, 130], dailyNew: [18, 22, 20, 15, 12, 10] },
+            5: { points: [140, 130, 118, 108, 100, 95], dailyNew: [8, 12, 15, 10, 9, 7] }
+        };
+        
+        const goalStatsData = {
+            0: [
+                ['2025-12-03','250','7.2%','42.15%','42.15%','3,520'],
+                ['2025-12-02','228','6.8%','40.85%','40.85%','3,270'],
+                ['2025-12-01','215','6.5%','39.12%','39.12%','3,042'],
+                ['2025-11-30','198','5.9%','37.88%','37.88%','2,827'],
+                ['2025-11-29','185','5.6%','36.54%','36.54%','2,629'],
+                ['2025-11-28','172','5.3%','35.10%','35.10%','2,444']
+            ],
+            1: [
+                ['2025-12-03','125','8.32%','45.32%','34.89%','1,860'],
+                ['2025-12-02','98','6.54%','43.87%','33.12%','1,735'],
+                ['2025-12-01','156','10.24%','42.65%','32.08%','1,637'],
+                ['2025-11-30','87','5.76%','41.98%','31.54%','1,481'],
+                ['2025-11-29','112','7.43%','41.20%','30.89%','1,394'],
+                ['2025-11-28','73','4.86%','40.55%','30.12%','1,282']
+            ],
+            2: [
+                ['2025-12-03','180','6.80%','55.00%','55.00%','2,780'],
+                ['2025-12-02','165','6.20%','53.50%','53.50%','2,600'],
+                ['2025-12-01','152','5.80%','51.80%','51.80%','2,435'],
+                ['2025-11-30','140','5.30%','50.10%','50.10%','2,283'],
+                ['2025-11-29','128','4.90%','48.60%','48.60%','2,143'],
+                ['2025-11-28','118','4.50%','47.20%','47.20%','2,015']
+            ],
+            3: [
+                ['2025-12-03','210','5.20%','62.00%','62.00%','4,120'],
+                ['2025-12-02','198','4.80%','60.50%','60.50%','3,910'],
+                ['2025-12-01','185','4.50%','59.00%','59.00%','3,712'],
+                ['2025-11-30','172','4.20%','57.50%','57.50%','3,527'],
+                ['2025-11-29','160','3.90%','56.00%','56.00%','3,355'],
+                ['2025-11-28','150','3.60%','54.50%','54.50%','3,195']
+            ],
+            4: [
+                ['2025-12-03','95','5.80%','34.00%','34.00%','1,520'],
+                ['2025-12-02','88','5.30%','32.85%','32.85%','1,425'],
+                ['2025-12-01','80','4.90%','31.60%','31.60%','1,337'],
+                ['2025-11-30','73','4.50%','30.35%','30.35%','1,257'],
+                ['2025-11-29','65','4.00%','29.10%','29.10%','1,184'],
+                ['2025-11-28','58','3.60%','27.85%','27.85%','1,119']
+            ],
+            5: [
+                ['2025-12-03','45','6.50%','28.50%','28.50%','890'],
+                ['2025-12-02','40','5.80%','27.10%','27.10%','845'],
+                ['2025-12-01','36','5.20%','25.80%','25.80%','805'],
+                ['2025-11-30','32','4.60%','24.50%','24.50%','769'],
+                ['2025-11-29','28','4.00%','23.20%','23.20%','737'],
+                ['2025-11-28','25','3.50%','21.90%','21.90%','709']
+            ]
+        };
+        
+        function switchGoalDetail(el, goalId) {
+            document.querySelectorAll('.goal-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            
+            const d = goalData[goalId];
+            const panel = document.getElementById('goalPanelBody');
+            panel.innerHTML = `
+                <div class="goal-condition-row">
+                    <div class="goal-condition-left">
+                        <div class="goal-condition-line">
+                            <strong>初始条件：</strong>${d.condition}
+                        </div>
+                        <div class="goal-condition-time">认定时间：${d.time}</div>
+                    </div>
+                    <div class="goal-progress-ring-small">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <circle cx="30" cy="30" r="26" fill="none" stroke="#f0f0f0" stroke-width="6"/>
+                            <circle cx="30" cy="30" r="26" fill="none" stroke="#52c41a" stroke-width="6"
+                                    stroke-dasharray="163.36" stroke-dashoffset="${163.36 - 163.36 * d.progress / 100}" stroke-linecap="round"
+                                    transform="rotate(-90 30 30)"/>
+                            <text x="30" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#333">${d.progress}%</text>
+                            <text x="30" y="40" text-anchor="middle" font-size="9" fill="#999">进度</text>
+                        </svg>
+                        <div style="font-size: 11px; color: #999; margin-top: 4px; text-align: center;">${d.complete}</div>
+                    </div>
+                </div>
+                <div class="goal-customer-cards">
+                    <div class="goal-customer-card green-border">
+                        <div class="goal-customer-card-header">
+                            <div class="goal-customer-card-bar green-bar"></div>
+                            <span class="goal-customer-card-title">完成目标客户</span>
+                            <div class="goal-customer-card-num">
+                                <span class="goal-customer-value">${d.completeClients}</span>
+                                <span class="goal-customer-badge green-badge">转化率：${d.convertRate}</span>
+                            </div>
+                        </div>
+                        <div class="goal-customer-metrics">
+                            <div class="goal-customer-metric">
+                                <div class="metric-label">期初值（万）</div>
+                                <div class="metric-value">${d.initialValue}</div>
+                            </div>
+                            <div class="goal-customer-metric">
+                                <div class="metric-label">期末值（万）</div>
+                                <div class="metric-value">${d.endValue}</div>
+                            </div>
+                            <div class="goal-customer-metric">
+                                <div class="metric-label">完成值（万）</div>
+                                <div class="metric-value">${d.finalValue}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="goal-customer-card orange-border">
+                        <div class="goal-customer-card-header">
+                            <div class="goal-customer-card-bar orange-bar"></div>
+                            <span class="goal-customer-card-title">渠道响应客户</span>
+                            <div class="goal-customer-card-num">
+                                <span class="goal-customer-value">${d.responseClients}</span>
+                            </div>
+                        </div>
+                        <div class="goal-customer-metrics">
+                            <div class="goal-customer-metric">
+                                <div class="metric-label">期初值（万）</div>
+                                <div class="metric-value">${d.initialValue}</div>
+                            </div>
+                            <div class="goal-customer-metric">
+                                <div class="metric-label">期末值（万）</div>
+                                <div class="metric-value">${d.endValue}</div>
+                            </div>
+                            <div class="goal-customer-metric">
+                                <div class="metric-label">完成值（万）</div>
+                                <div class="metric-value">${d.finalValue}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 更新目标趋势图表
+            updateTrendChart(goalId);
+            
+            // 更新目标效果统计表
+            updateStatsTable(goalId);
+        }
+        
+        function updateTrendChart(goalId) {
+            const td = goalTrendData[goalId];
+            const pts = td.points;
+            const dailyNew = td.dailyNew;
+            const labels = ['11/28', '11/29', '11/30', '12/01', '12/02', '12/03'];
+            const xPos = [50, 150, 250, 350, 450, 550];
+            const maxVal = Math.max(...pts) + 50;
+            const toY = (v) => 160 - (v / maxVal) * 140;
+            
+            let pathD = '';
+            let circles = '';
+            let dateLabels = '';
+            pts.forEach((p, i) => {
+                const y = toY(p);
+                pathD += (i === 0 ? 'M' : 'L') + ' ' + xPos[i] + ' ' + y;
+                circles += '<circle cx="' + xPos[i] + '" cy="' + y + '" r="4" fill="' + (i < 3 ? '#722ed1' : '#1890ff') + '"/>';
+                dateLabels += '<text x="' + xPos[i] + '" y="175" font-size="10" fill="#999" text-anchor="middle">' + labels[i] + '</text>';
+            });
+            
+            document.getElementById('goalTrendChart').innerHTML = `
+                <svg width="600" height="200" viewBox="0 0 600 200">
+                    <defs>
+                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#722ed1"/>
+                            <stop offset="100%" style="stop-color:#1890ff"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="50" y1="20" x2="50" y2="160" stroke="#e8e8e8" stroke-width="1"/>
+                    <line x1="50" y1="160" x2="570" y2="160" stroke="#e8e8e8" stroke-width="1"/>
+                    <text x="10" y="164" font-size="10" fill="#999" text-anchor="end">0</text>
+                    <text x="10" y="104" font-size="10" fill="#999" text-anchor="end">${Math.round(maxVal/2)}</text>
+                    <text x="10" y="44" font-size="10" fill="#999" text-anchor="end">${maxVal}</text>
+                    <path d="${pathD}" fill="none" stroke="url(#lineGradient)" stroke-width="3"/>
+                    ${circles}
+                    ${dateLabels}
+                </svg>
+            `;
+        }
+        
+        function updateStatsTable(goalId) {
+            const rows = goalStatsData[goalId];
+            let html = '';
+            rows.forEach(r => {
+                html += '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td><td>' + r[4] + '</td><td>' + r[5] + '</td></tr>';
+            });
+            document.getElementById('goalStatsBody').innerHTML = html;
+        }
+        
+        // 初始化：加载总目标数据
+        switchGoalDetail(document.querySelector('.goal-tab.active'), 0);
+        
+        // Tab切换
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Chart Tab切换
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 策略弹板
+        function showStrategyPanel() {
+            document.getElementById('strategyPanel').style.display = 'block';
+        }
+
+        function hideStrategyPanel() {
+            document.getElementById('strategyPanel').style.display = 'none';
+        }
+
+        // 组件抽屉
+        function showComponentModal() {
+            document.getElementById('strategyPanel').style.display = 'none';
+            document.getElementById('componentModal').style.display = 'block';
+        }
+
+        function hideComponentDrawer() {
+            document.getElementById('componentModal').style.display = 'none';
+        }
+        
+        function switchComponentTab(type) {
+            document.querySelectorAll('.component-modal-tab').forEach(t => t.classList.remove('active'));
+            if (type === 'config') {
+                document.querySelectorAll('.component-modal-tab')[0].classList.add('active');
+                document.getElementById('componentTabConfig').style.display = 'block';
+                document.getElementById('componentTabFlow').style.display = 'none';
+            } else {
+                document.querySelectorAll('.component-modal-tab')[1].classList.add('active');
+                document.getElementById('componentTabConfig').style.display = 'none';
+                document.getElementById('componentTabFlow').style.display = 'block';
+            }
+        }
+
+        // 客户明细弹窗
+        const customerData = {
+            inflow: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2023120001', '张三', '2025-12-03 09:15:22'],
+                    ['KH2023120002', '李四', '2025-12-03 10:08:45'],
+                    ['KH2023120003', '王五', '2025-12-03 11:22:10'],
+                    ['KH2023120004', '赵六', '2025-12-03 13:45:33'],
+                    ['KH2023120005', '孙七', '2025-12-04 08:30:18'],
+                    ['KH2023120006', '周八', '2025-12-04 09:55:07'],
+                    ['KH2023120007', '吴九', '2025-12-04 14:12:51'],
+                    ['KH2023120008', '郑十', '2025-12-05 10:20:39'],
+                    ['KH2023120009', '冯十一', '2025-12-05 15:08:14'],
+                    ['KH2023120010', '陈十二', '2025-12-06 08:45:26'],
+                    ['KH2023120011', '褚十三', '2025-12-06 11:33:59'],
+                    ['KH2023120012', '卫十四', '2025-12-06 16:18:42']
+                ]
+            },
+            outflow: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2023080101', '钱一', '2025-12-03 07:22:15'],
+                    ['KH2023080102', '杨二', '2025-12-03 09:40:08'],
+                    ['KH2023080103', '黄三', '2025-12-04 10:15:33'],
+                    ['KH2023080104', '刘四', '2025-12-04 14:50:21'],
+                    ['KH2023080105', '马五', '2025-12-05 08:12:47'],
+                    ['KH2023080106', '朱六', '2025-12-05 11:28:55'],
+                    ['KH2023080107', '胡七', '2025-12-06 09:35:19'],
+                    ['KH2023080108', '林八', '2025-12-06 15:05:30']
+                ]
+            },
+            leakage: {
+                columns: ['客户号', '客户姓名', '漏损原因', '流转时间'],
+                rows: [
+                    ['KH2023051001', '高甲', '响应超时未回复', '2025-12-03 08:55:12'],
+                    ['KH2023051002', '林乙', '客户主动拒接', '2025-12-03 10:22:44'],
+                    ['KH2023051003', '何丙', '号码已停机', '2025-12-03 14:18:30'],
+                    ['KH2023051004', '郭丁', '重复号码去重', '2025-12-04 09:05:18'],
+                    ['KH2023051005', '罗戊', '黑名单拦截', '2025-12-04 11:40:55'],
+                    ['KH2023051006', '梁己', '渠道容量已满', '2025-12-04 15:33:27'],
+                    ['KH2023051007', '宋庚', '响应超时未回复', '2025-12-05 08:50:11'],
+                    ['KH2023051008', '唐辛', '客户主动拒接', '2025-12-05 13:15:39'],
+                    ['KH2023051009', '韩壬', '其他原因', '2025-12-06 10:28:06'],
+                    ['KH2023051010', '曹癸', '黑名单拦截', '2025-12-06 14:42:50']
+                ]
+            },
+            issued: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010101', '张明', '2025-12-03 09:10:15'],
+                    ['KH2024010102', '李华', '2025-12-03 10:25:30'],
+                    ['KH2024010103', '王强', '2025-12-03 13:40:22'],
+                    ['KH2024010104', '赵丽', '2025-12-04 08:55:48'],
+                    ['KH2024010105', '孙鹏', '2025-12-04 11:12:35'],
+                    ['KH2024010106', '周敏', '2025-12-05 09:30:19'],
+                    ['KH2024010107', '吴磊', '2025-12-05 14:18:44'],
+                    ['KH2024010108', '郑洁', '2025-12-06 10:05:57']
+                ]
+            },
+            unissued: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010201', '陈鑫', '2025-12-03 08:20:33'],
+                    ['KH2024010202', '褚峰', '2025-12-04 09:45:18'],
+                    ['KH2024010203', '卫兰', '2025-12-04 15:22:40'],
+                    ['KH2024010204', '蒋涛', '2025-12-05 10:08:55'],
+                    ['KH2024010205', '沈静', '2025-12-06 11:35:21']
+                ]
+            },
+            executed: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010301', '韩雪', '2025-12-03 09:35:42'],
+                    ['KH2024010302', '杨帆', '2025-12-03 14:20:18'],
+                    ['KH2024010303', '朱凯', '2025-12-04 10:15:30'],
+                    ['KH2024010304', '秦梅', '2025-12-04 16:40:55'],
+                    ['KH2024010305', '许诺', '2025-12-05 08:55:12'],
+                    ['KH2024010306', '何方', '2025-12-06 13:28:44']
+                ]
+            },
+            unexecuted: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010401', '吕刚', '2025-12-03 11:05:28'],
+                    ['KH2024010402', '施琳', '2025-12-04 13:32:15'],
+                    ['KH2024010403', '魏东', '2025-12-05 09:18:40'],
+                    ['KH2024010404', '严华', '2025-12-06 10:50:22']
+                ]
+            },
+            reached: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010501', '金鑫', '2025-12-03 10:22:15'],
+                    ['KH2024010502', '陶然', '2025-12-03 15:40:30'],
+                    ['KH2024010503', '姜维', '2025-12-04 08:35:48'],
+                    ['KH2024010504', '戚薇', '2025-12-05 11:12:55'],
+                    ['KH2024010505', '谢天', '2025-12-06 14:28:33']
+                ]
+            },
+            unreached: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010601', '邹宇', '2025-12-03 12:15:40'],
+                    ['KH2024010602', '苏蕾', '2025-12-04 14:50:22'],
+                    ['KH2024010603', '潘安', '2025-12-05 10:35:18']
+                ]
+            },
+            responded: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010701', '范成', '2025-12-03 11:30:15'],
+                    ['KH2024010702', '彭亮', '2025-12-04 09:18:40'],
+                    ['KH2024010703', '鲁达', '2025-12-04 15:55:22'],
+                    ['KH2024010704', '韦德', '2025-12-05 10:42:35'],
+                    ['KH2024010705', '昌浩', '2025-12-06 12:20:48']
+                ]
+            },
+            unresponded: {
+                columns: ['客户号', '客户姓名', '流转时间'],
+                rows: [
+                    ['KH2024010801', '马骏', '2025-12-03 13:40:28'],
+                    ['KH2024010802', '苗青', '2025-12-04 10:55:15'],
+                    ['KH2024010803', '花荣', '2025-12-05 14:30:42'],
+                    ['KH2024010804', '方杰', '2025-12-06 09:18:55']
+                ]
+            }
+        };
+        
+        // 客户明细弹窗 - 两大Tab分组
+        const tabGroups = {
+            flow: {
+                label: '流转信息',
+                tabs: [
+                    { type: 'inflow', label: '流入客户' },
+                    { type: 'outflow', label: '流出客户' },
+                    { type: 'leakage', label: '漏损客户' }
+                ]
+            },
+            entity: {
+                label: '客户分类',
+                tabs: [
+                    { type: 'issued', label: '下发客户' },
+                    { type: 'unissued', label: '未下发' },
+                    { type: 'executed', label: '执行客户' },
+                    { type: 'unexecuted', label: '未执行' },
+                    { type: 'reached', label: '触达客户' },
+                    { type: 'unreached', label: '未触达' },
+                    { type: 'responded', label: '响应客户' },
+                    { type: 'unresponded', label: '未响应' }
+                ]
+            }
+        };
+        
+        // 判断 type 属于哪个分组
+        function getTabGroup(type) {
+            if (type === 'inflow' || type === 'outflow' || type === 'leakage') return 'flow';
+            return 'entity';
+        }
+        
+        let currentCustomerType = 'inflow';
+        let currentTabGroup = 'flow';
+        
+        function showCustomerModal(type) {
+            currentCustomerType = type;
+            currentTabGroup = getTabGroup(type);
+            
+            document.getElementById('customerModalOverlay').style.display = 'block';
+            document.getElementById('customerModal').style.display = 'flex';
+            
+            renderCustomerTabs(currentTabGroup, type);
+            renderCustomerTable(type);
+        }
+        
+        function renderCustomerTabs(groupKey, activeType) {
+            const group = tabGroups[groupKey];
+            const container = document.getElementById('customerModalTabs');
+            
+            let html = '<span class="customer-tab-group-label">' + group.label + '</span>';
+            group.tabs.forEach(t => {
+                const activeClass = t.type === activeType ? ' active' : '';
+                html += '<span class="customer-modal-tab' + activeClass + '" data-type="' + t.type + '" onclick="switchCustomerTab(\'' + t.type + '\')">' + t.label + '</span>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function hideCustomerModal() {
+            document.getElementById('customerModalOverlay').style.display = 'none';
+            document.getElementById('customerModal').style.display = 'none';
+        }
+        
+        function switchCustomerTab(type) {
+            currentCustomerType = type;
+            // 更新 active 状态
+            document.querySelectorAll('.customer-modal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.customer-modal-tab[data-type="' + type + '"]').classList.add('active');
+            renderCustomerTable(type);
+        }
+        
+        // 客户列表全量数据缓存 & 选中状态
+        let customerAllRows = [];
+        let customerSelectedSet = new Set();
+        let customerSearchKeyword = '';
+        
+        function renderCustomerTable(type) {
+            const data = customerData[type];
+            customerAllRows = data.rows.map((row, idx) => ({ index: idx, row: row }));
+            customerSelectedSet = new Set();
+            customerSearchKeyword = '';
+            document.getElementById('customerSearchInput').value = '';
+            document.getElementById('customerSelectedInfo').style.display = 'none';
+            doRenderTable();
+        }
+        
+        function doRenderTable() {
+            const data = currentCustomerType ? customerData[currentCustomerType] : null;
+            if (!data) return;
+            
+            // 搜索过滤
+            let filteredRows = customerAllRows;
+            if (customerSearchKeyword.trim()) {
+                const kw = customerSearchKeyword.trim().toLowerCase();
+                filteredRows = customerAllRows.filter(item => item.row[0].toLowerCase().includes(kw));
+            }
+            
+            const allChecked = filteredRows.length > 0 && filteredRows.every(item => customerSelectedSet.has(item.index));
+            
+            let headHtml = '<tr>';
+            headHtml += '<th><input type="checkbox" class="customer-checkbox" ' + (allChecked ? 'checked' : '') + ' onclick="customerToggleAllFiltered(this, ' + JSON.stringify(filteredRows.map(r => r.index)) + ')"></th>';
+            data.columns.forEach(col => {
+                headHtml += '<th>' + col + '</th>';
+            });
+            headHtml += '</tr>';
+            
+            let bodyHtml = '';
+            filteredRows.forEach(item => {
+                const isSelected = customerSelectedSet.has(item.index);
+                bodyHtml += '<tr class="' + (isSelected ? 'selected' : '') + '">';
+                bodyHtml += '<td><input type="checkbox" class="customer-checkbox" ' + (isSelected ? 'checked' : '') + ' onclick="customerToggleRow(' + item.index + ', this)"></td>';
+                item.row.forEach(cell => {
+                    bodyHtml += '<td>' + cell + '</td>';
+                });
+                bodyHtml += '</tr>';
+            });
+            
+            document.getElementById('customerTableHead').innerHTML = headHtml;
+            document.getElementById('customerTableBody').innerHTML = bodyHtml;
+            
+            updateSelectedInfo();
+        }
+        
+        function customerToggleRow(index, checkbox) {
+            if (checkbox.checked) {
+                customerSelectedSet.add(index);
+                checkbox.closest('tr').classList.add('selected');
+            } else {
+                customerSelectedSet.delete(index);
+                checkbox.closest('tr').classList.remove('selected');
+            }
+            updateSelectedInfo();
+        }
+        
+        function customerToggleAllFiltered(checkbox, indices) {
+            if (checkbox.checked) {
+                indices.forEach(i => customerSelectedSet.add(i));
+            } else {
+                indices.forEach(i => customerSelectedSet.delete(i));
+            }
+            doRenderTable();
+        }
+        
+        function customerSelectAll(notify) {
+            // 全选当前所有数据
+            customerAllRows.forEach(item => customerSelectedSet.add(item.index));
+            doRenderTable();
+            if (notify) alert('已全选 ' + customerAllRows.length + ' 条客户记录，可点击"加入客户群组"进行批量操作');
+        }
+        
+        function customerAddToGroup() {
+            if (customerSelectedSet.size === 0) {
+                alert('请先选择要加入群组的客户');
+                return;
+            }
+            const selectedIds = [];
+            customerAllRows.forEach(item => {
+                if (customerSelectedSet.has(item.index)) selectedIds.push(item.row[0]);
+            });
+            alert('已将 ' + selectedIds.length + ' 位客户（' + selectedIds.slice(0, 3).join('、') + (selectedIds.length > 3 ? '...等' : '') + '）加入客户群组');
+        }
+        
+        function customerExport() {
+            const data = customerData[currentCustomerType];
+            if (!data) return;
+            
+            let filteredRows = customerAllRows;
+            if (customerSearchKeyword.trim()) {
+                const kw = customerSearchKeyword.trim().toLowerCase();
+                filteredRows = customerAllRows.filter(item => item.row[0].toLowerCase().includes(kw));
+            }
+            
+            let csv = '\uFEFF' + data.columns.join(',') + '\n';
+            filteredRows.forEach(item => {
+                csv += item.row.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '客户列表_' + currentCustomerType + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function customerSearch() {
+            customerSearchKeyword = document.getElementById('customerSearchInput').value;
+            doRenderTable();
+        }
+        
+        function updateSelectedInfo() {
+            const info = document.getElementById('customerSelectedInfo');
+            const countEl = document.getElementById('customerSelectedCount');
+            if (customerSelectedSet.size > 0) {
+                info.style.display = 'block';
+                countEl.textContent = customerSelectedSet.size;
+            } else {
+                info.style.display = 'none';
+            }
+        }
+
+        // ===== 渠道占比动态饼图 =====
+        const pieColors = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#fc8452', '#9a60b4', '#3ba272'];
+        
+        const channelPieData = {
+            issued: {
+                label: '下发总数',
+                channels: ['短信', 'APP-PUSH', '掌银APP', '智能外呼', '企微'],
+                values: [922, 849, 558, 352, 449],
+                rates: ['24%', '23%', '18%', '14%', '15%']
+            },
+            executed: {
+                label: '执行总数',
+                channels: ['短信', 'APP-PUSH', '掌银APP', '智能外呼', '企微'],
+                values: [820, 756, 498, 310, 396],
+                rates: ['29%', '27%', '17%', '11%', '14%']
+            },
+            reached: {
+                label: '触达总数',
+                channels: ['短信', 'APP-PUSH', '掌银APP', '智能外呼', '企微'],
+                values: [738, 680, 423, 264, 337],
+                rates: ['30%', '27%', '18%', '11%', '13%']
+            },
+            responded: {
+                label: '响应总数',
+                channels: ['短信', 'APP-PUSH', '掌银APP', '智能外呼', '企微'],
+                values: [590, 544, 338, 211, 269],
+                rates: ['31%', '28%', '18%', '10%', '13%']
+            }
+        };
+        
+        function updateChannelPie() {
+            const filter = document.getElementById('channelPieFilter').value;
+            const data = channelPieData[filter];
+            const total = data.values.reduce((a, b) => a + b, 0);
+            
+            // 更新中心文字
+            document.getElementById('channelPieTotal').textContent = total;
+            document.getElementById('channelPieLabel').textContent = data.label;
+            
+            // 渲染饼图
+            const cx = 90, cy = 90, r = 62, sw = 30;
+            const circumference = 2 * Math.PI * r;
+            let accumulated = 0;
+            let svgHtml = '';
+            
+            data.values.forEach((v, i) => {
+                const ratio = v / total;
+                const dashLen = ratio * circumference;
+                const offset = -accumulated * circumference / (2 * Math.PI * r);
+                svgHtml += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + pieColors[i] + '" stroke-width="' + sw + '" stroke-dasharray="' + dashLen + ' ' + (circumference - dashLen) + '" stroke-dashoffset="' + offset + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"/>';
+                accumulated += ratio;
+            });
+            
+            document.getElementById('channelPieSvg').innerHTML = svgHtml;
+            
+            // 渲染图例
+            let legendHtml = '';
+            data.channels.forEach((ch, i) => {
+                const pct = Math.round(data.values[i] / total * 100) + '%';
+                legendHtml += '<div class="channel-legend-item">';
+                legendHtml += '<div class="channel-legend-left"><div class="channel-legend-dot" style="background:' + pieColors[i] + ';"></div><span>' + ch + '</span></div>';
+                legendHtml += '<span>' + data.values[i] + ' (' + pct + ')</span>';
+                legendHtml += '</div>';
+            });
+            
+            document.getElementById('channelPieLegend').innerHTML = legendHtml;
+        }
+        
+        // ===== 渠道排名数据 =====
+        const rankData = {
+            manual: {
+                executed: [
+                    { name: '掌银', rate: '84%', value: 386 },
+                    { name: '企微', rate: '72%', value: 281 },
+                    { name: '电销', rate: '56%', value: 204 }
+                ],
+                issued: [
+                    { name: '掌银', rate: '90%', value: 412 },
+                    { name: '企微', rate: '78%', value: 305 },
+                    { name: '电销', rate: '62%', value: 228 }
+                ],
+                reached: [
+                    { name: '掌银', rate: '76%', value: 340 },
+                    { name: '企微', rate: '68%', value: 255 },
+                    { name: '电销', rate: '48%', value: 176 }
+                ],
+                responded: [
+                    { name: '掌银', rate: '65%', value: 272 },
+                    { name: '企微', rate: '52%', value: 204 },
+                    { name: '电销', rate: '38%', value: 140 }
+                ]
+            },
+            customer: {
+                executed: [
+                    { name: '短信', rate: '84%', value: 386 },
+                    { name: 'APP_Push', rate: '72%', value: 281 },
+                    { name: '外呼', rate: '56%', value: 204 },
+                    { name: '外呼（新）', rate: '48%', value: 176 }
+                ],
+                issued: [
+                    { name: '短信', rate: '92%', value: 421 },
+                    { name: 'APP_Push', rate: '80%', value: 318 },
+                    { name: '外呼', rate: '64%', value: 235 },
+                    { name: '外呼（新）', rate: '52%', value: 192 }
+                ],
+                reached: [
+                    { name: '短信', rate: '78%', value: 355 },
+                    { name: 'APP_Push', rate: '66%', value: 252 },
+                    { name: '外呼', rate: '50%', value: 182 },
+                    { name: '外呼（新）', rate: '42%', value: 155 }
+                ],
+                responded: [
+                    { name: '短信', rate: '68%', value: 284 },
+                    { name: 'APP_Push', rate: '58%', value: 218 },
+                    { name: '外呼', rate: '44%', value: 145 },
+                    { name: '外呼（新）', rate: '36%', value: 124 }
+                ]
+            }
+        };
+        
+        const metricLabels = { executed: '执行', issued: '下发', reached: '触达', responded: '响应' };
+        
+        function renderRankList(containerId, items, metric) {
+            const lbl = metricLabels[metric] || '执行';
+            let html = '';
+            items.forEach((item, i) => {
+                const cls = i < 3 ? ' top3' : '';
+                html += '<div class="channel-ranking-item">';
+                html += '<div class="channel-rank-num' + cls + '">' + (i + 1) + '</div>';
+                html += '<div class="channel-rank-info">';
+                html += '<div class="channel-rank-name">' + item.name + '</div>';
+                html += '<div class="channel-rank-rate">' + lbl + '率 ' + item.rate + '</div>';
+                html += '</div>';
+                html += '<div class="channel-rank-value">' + lbl + '数 ' + item.value + '</div>';
+                html += '</div>';
+            });
+            document.getElementById(containerId).innerHTML = html;
+        }
+        
+        function updateManualRank(metric) {
+            renderRankList('manualRankList', rankData.manual[metric], metric);
+        }
+        
+        function updateCustomerRank(metric) {
+            renderRankList('customerRankList', rankData.customer[metric], metric);
+        }
+        
+        // 初始化渠道模块
+        updateChannelPie();
+        updateManualRank('executed');
+        updateCustomerRank('executed');
+
+        // ===== 转化分析 KPI 配置 =====
+        const allKpiMetrics = [
+            { key: 'aum_rate', name: '人均AUM提升率' },
+            { key: 'gold_rate', name: '输金率' },
+            { key: 'platinum_rate', name: '输白金率' },
+            { key: 'loan_rate', name: '人均贷款提升率' },
+            { key: 'deposit_rate', name: '人均存款提升率' },
+            { key: 'product_rate', name: '产品持有率' },
+            { key: 'cross_sell', name: '交叉销售率' },
+            { key: 'churn_rate', name: '客户流失率' }
+        ];
+        
+        // 默认选中4个
+        let selectedKpiMetrics = ['aum_rate', 'gold_rate', 'platinum_rate', 'loan_rate'];
+        let currentKpiFilter = 'all';
+        
+        // 不同筛选条件下的KPI数据
+        const kpiDataByFilter = {
+            all:       { aum_rate:'76.32%', gold_rate:'43.02%', platinum_rate:'82.02%', loan_rate:'85.21%', deposit_rate:'62.15%', product_rate:'58.33%', cross_sell:'34.77%', churn_rate:'12.05%' },
+            issued:    { aum_rate:'72.10%', gold_rate:'40.55%', platinum_rate:'78.30%', loan_rate:'80.11%', deposit_rate:'58.20%', product_rate:'55.10%', cross_sell:'31.22%', churn_rate:'14.30%' },
+            unissued:  { aum_rate:'18.40%', gold_rate:'8.20%',  platinum_rate:'22.10%', loan_rate:'15.60%', deposit_rate:'19.30%', product_rate:'12.50%', cross_sell:'5.80%',  churn_rate:'28.80%' },
+            executed:  { aum_rate:'82.56%', gold_rate:'51.33%', platinum_rate:'88.40%', loan_rate:'90.22%', deposit_rate:'70.50%', product_rate:'65.80%', cross_sell:'42.10%', churn_rate:'8.80%' },
+            unexecuted:{ aum_rate:'35.20%', gold_rate:'18.60%', platinum_rate:'30.50%', loan_rate:'28.90%', deposit_rate:'25.40%', product_rate:'20.30%', cross_sell:'10.50%', churn_rate:'25.60%' },
+            reached:    { aum_rate:'78.30%', gold_rate:'47.80%', platinum_rate:'85.20%', loan_rate:'87.50%', deposit_rate:'66.80%', product_rate:'62.10%', cross_sell:'38.90%', churn_rate:'10.10%' },
+            unreached:  { aum_rate:'22.50%', gold_rate:'12.30%', platinum_rate:'25.80%', loan_rate:'18.40%', deposit_rate:'20.60%', product_rate:'15.20%', cross_sell:'7.40%',  churn_rate:'32.10%' },
+            responded:  { aum_rate:'88.90%', gold_rate:'58.20%', platinum_rate:'92.50%', loan_rate:'94.80%', deposit_rate:'78.30%', product_rate:'72.60%', cross_sell:'55.40%', churn_rate:'4.50%' },
+            unresponded:{ aum_rate:'14.20%', gold_rate:'6.80%',  platinum_rate:'18.30%', loan_rate:'12.50%', deposit_rate:'15.80%', product_rate:'10.40%', cross_sell:'4.20%',  churn_rate:'40.20%' }
+        };
+        
+        function initKpiConfig() {
+            const body = document.getElementById('kpiConfigBody');
+            let html = '';
+            allKpiMetrics.forEach(m => {
+                const sel = selectedKpiMetrics.includes(m.key) ? ' selected' : '';
+                html += '<div class="kpi-config-option' + sel + '" data-key="' + m.key + '" onclick="toggleKpiOption(this)">' + m.name + '</div>';
+            });
+            body.innerHTML = html;
+        }
+        
+        function toggleKpiOption(el) {
+            const key = el.getAttribute('data-key');
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                selectedKpiMetrics = selectedKpiMetrics.filter(k => k !== key);
+            } else {
+                if (selectedKpiMetrics.length >= 4) {
+                    alert('最多选择4个指标');
+                    return;
+                }
+                el.classList.add('selected');
+                selectedKpiMetrics.push(key);
+            }
+        }
+        
+        function toggleKpiConfig() {
+            const panel = document.getElementById('kpiConfigPanel');
+            const overlay = document.getElementById('kpiConfigOverlay');
+            const show = panel.style.display === 'none' || panel.style.display === '';
+            if (show) {
+                // 同步选中状态
+                document.querySelectorAll('.kpi-config-option').forEach(el => {
+                    const key = el.getAttribute('data-key');
+                    if (selectedKpiMetrics.includes(key)) {
+                        el.classList.add('selected');
+                    } else {
+                        el.classList.remove('selected');
+                    }
+                });
+                panel.style.display = 'block';
+                overlay.style.display = 'block';
+            } else {
+                hideKpiConfig();
+            }
+        }
+        
+        function hideKpiConfig() {
+            document.getElementById('kpiConfigPanel').style.display = 'none';
+            document.getElementById('kpiConfigOverlay').style.display = 'none';
+        }
+        
+        function saveKpiConfig() {
+            // 从DOM收集选中
+            const opts = document.querySelectorAll('.kpi-config-option.selected');
+            selectedKpiMetrics = Array.from(opts).map(el => el.getAttribute('data-key'));
+            renderKpiRow();
+            hideKpiConfig();
+        }
+        
+        function filterKpiMetric() {
+            currentKpiFilter = document.getElementById('kpiFilterSelect').value;
+            renderKpiRow();
+        }
+        
+        function renderKpiRow() {
+            const container = document.getElementById('conversionKpiRow');
+            const data = kpiDataByFilter[currentKpiFilter];
+            const colors = ['#ff4d4f', '#5470c6', '#52c41a', '#fa8c16'];
+            
+            let html = '';
+            selectedKpiMetrics.forEach((key, i) => {
+                const metric = allKpiMetrics.find(m => m.key === key);
+                if (!metric) return;
+                html += '<div class="conversion-kpi">';
+                html += '<div class="conversion-kpi-icon" style="background:' + (colors[i] || '#ff4d4f') + ';"></div>';
+                html += '<div class="conversion-kpi-content">';
+                html += '<div class="conversion-kpi-label">' + metric.name + '</div>';
+                html += '<div class="conversion-kpi-value">' + (data[key] || '-') + '</div>';
+                html += '</div>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+        
+        initKpiConfig();
+        renderKpiRow();
+        
+        // ===== 转化分析漏斗 =====
+        const funnelData = {
+            layers: [
+                { title: '下发数', value: '7,432,874', subLabel: '未下发数', subValue: '12,074', color: '#5470c6', clip: 'polygon(0 0, 100% 0, 90% 100%, 10% 100%)' },
+                { title: '执行数', value: '4,430,000', subLabel: '未执行数', subValue: '3,001,034', color: '#2ecc71', clip: 'polygon(10% 0, 90% 0, 85% 100%, 15% 100%)' },
+                { title: '触达数', value: '3,850,000', subLabel: '未触达数', subValue: '580,000', color: '#34495e', clip: 'polygon(15% 0, 85% 0, 80% 100%, 20% 100%)' },
+                { title: '响应数', value: '430,000', subLabel: '未响应数', subValue: '3,420,000', color: '#f1c40f', clip: 'polygon(20% 0, 80% 0, 75% 100%, 25% 100%)' }
+            ],
+            rates: [
+                { label: '下发率', value: '99.84%' },
+                { label: '执行率', value: '59.61%' },
+                { label: '触达率', value: '86.91%' },
+                { label: '响应率', value: '11.17%' }
+            ],
+            conversions: [
+                null,
+                { label: '下发→执行转化率', value: '59.61%' },
+                { label: '执行→触达转化率', value: '86.91%' },
+                { label: '触达→响应转化率', value: '11.17%' }
+            ]
+        };
+        
+        function renderFunnel() {
+            const container = document.getElementById('funnelChart');
+            let html = '';
+            funnelData.layers.forEach((layer, i) => {
+                // 层间转化率（第一层没有）
+                if (i > 0 && funnelData.conversions[i]) {
+                    html += '<div class="funnel-conv-line">';
+                    html += '<span class="funnel-conv-arrow">↓</span>';
+                    html += '<span class="funnel-conv-rate">' + funnelData.conversions[i].label + ' ' + funnelData.conversions[i].value + '</span>';
+                    html += '</div>';
+                }
+                html += '<div class="funnel-level" style="background:' + layer.color + ';clip-path:' + layer.clip + ';">';
+                html += '<div class="funnel-level-title">' + layer.title + '</div>';
+                html += '<div class="funnel-level-value">' + layer.value + '</div>';
+                html += '<div class="funnel-level-sub">' + layer.subLabel + ': ' + layer.subValue + '</div>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+        
+        // ===== 转化分析趋势图 =====
+        const conversionTrendData = {
+            labels: ['10日', '11日', '12日', '13日', '14日', '15日', '16日'],
+            customer: [650, 843, 720, 910, 680, 750, 820],
+            executed: [340, 460, 410, 550, 390, 430, 500],
+            reached: [280, 380, 330, 450, 310, 350, 410],
+            responded: [180, 215, 200, 280, 190, 210, 260]
+        };
+        
+        const trendLines = [
+            { key: 'customer', color: '#5470c6', label: '下发数', visible: true },
+            { key: 'executed', color: '#2ecc71', label: '执行数', visible: true },
+            { key: 'reached', color: '#34495e', label: '触达数', visible: true },
+            { key: 'responded', color: '#f1c40f', label: '响应数', visible: true }
+        ];
+        
+        function toggleTrendLine(idx) {
+            trendLines[idx].visible = !trendLines[idx].visible;
+            updateConversionTrend();
+        }
+        
+        function updateConversionTrend() {
+            const data = conversionTrendData;
+            const container = document.getElementById('conversionChartContainer');
+            const legend = document.getElementById('conversionChartLegend');
+            const w = 440, h = 220, padL = 50, padR = 20, padT = 15, padB = 35;
+            const maxVal = 1000;
+            
+            const xStep = (w - padL - padR) / (data.labels.length - 1);
+            
+            function y(v) { return h - padB - (v / maxVal) * (h - padT - padB); }
+            
+            // 渲染图例
+            let legendHtml = '';
+            trendLines.forEach((line, i) => {
+                const cls = line.visible ? '' : ' hidden';
+                legendHtml += '<div class="conversion-chart-legend-item' + cls + '" onclick="toggleTrendLine(' + i + ')">';
+                legendHtml += '<div class="conversion-chart-legend-dot" style="background:' + line.color + ';"></div>';
+                legendHtml += '<span>' + line.label + '</span>';
+                legendHtml += '</div>';
+            });
+            legend.innerHTML = legendHtml;
+            
+            let svg = '<svg width="100%" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">';
+            
+            // Grid lines and Y-axis labels
+            for (let i = 0; i <= maxVal; i += 200) {
+                const yi = y(i);
+                svg += '<line x1="' + padL + '" y1="' + yi + '" x2="' + (w - padR) + '" y2="' + yi + '" stroke="#f0f0f0" stroke-width="1"/>';
+                svg += '<text x="' + (padL - 8) + '" y="' + (yi + 4) + '" text-anchor="end" font-size="10" fill="#999">' + i + '</text>';
+            }
+            
+            // X-axis labels
+            data.labels.forEach((l, i) => {
+                const xi = padL + i * xStep;
+                svg += '<text x="' + xi + '" y="' + (h - 12) + '" text-anchor="middle" font-size="10" fill="#999">' + l + '</text>';
+            });
+            
+            // Lines (only visible ones)
+            trendLines.forEach(line => {
+                if (!line.visible) return;
+                const pts = data[line.key].map((v, i) => padL + i * xStep + ',' + y(v)).join(' ');
+                svg += '<polyline points="' + pts + '" fill="none" stroke="' + line.color + '" stroke-width="2" stroke-linejoin="round"/>';
+                data[line.key].forEach((v, i) => {
+                    svg += '<circle cx="' + (padL + i * xStep) + '" cy="' + y(v) + '" r="3" fill="' + line.color + '" stroke="#fff" stroke-width="1"/>';
+                });
+            });
+            
+            svg += '</svg>';
+            container.innerHTML = svg;
+        }
+        
+        renderFunnel();
+        updateConversionTrend();
+
+        // ===== 趋势图 Tooltip 交互 =====
+        const trendChartConfig = { w: 440, h: 220, padL: 50, padR: 20, padT: 15, padB: 35 };
+        
+        function showTrendTooltip(e) {
+            const tooltip = document.getElementById('conversionTrendTooltip');
+            const container = document.getElementById('conversionChartContainer');
+            const rect = container.getBoundingClientRect();
+            const data = conversionTrendData;
+            const cfg = trendChartConfig;
+            
+            // 鼠标在容器内的相对位置
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // 换算到 SVG 坐标系
+            const svgX = (mouseX / rect.width) * cfg.w;
+            const xStep = (cfg.w - cfg.padL - cfg.padR) / (data.labels.length - 1);
+            
+            // 找到最近的数据点索引
+            let idx = Math.round((svgX - cfg.padL) / xStep);
+            idx = Math.max(0, Math.min(idx, data.labels.length - 1));
+            
+            // 对应点的 x 坐标
+            const ptX = cfg.padL + idx * xStep;
+            const pxInContainer = (ptX / cfg.w) * rect.width;
+            
+            // 构建 tooltip 内容
+            let html = '<div class="conversion-chart-tooltip-title">' + data.labels[idx] + '</div>';
+            trendLines.forEach(line => {
+                html += '<div class="conversion-chart-tooltip-item">';
+                html += '<div class="conversion-chart-tooltip-dot" style="background:' + line.color + ';"></div>';
+                html += '<span class="conversion-chart-tooltip-label">' + line.label + '</span>';
+                html += '<span class="conversion-chart-tooltip-value">' + data[line.key][idx] + '</span>';
+                html += '</div>';
+            });
+            
+            tooltip.innerHTML = html;
+            tooltip.style.display = 'block';
+            
+            // 定位 tooltip：优先在数据点右侧，如果太靠右则放左侧
+            const tipWidth = 140;
+            let left = pxInContainer + 12;
+            if (left + tipWidth > rect.width - 4) {
+                left = pxInContainer - tipWidth - 12;
+            }
+            let top = mouseY - 60;
+            if (top < 4) top = 4;
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        function hideTrendTooltip() {
+            document.getElementById('conversionTrendTooltip').style.display = 'none';
+        }
+
+        // ===== 任务分析 - 排名维度切换 =====
+        let taskRankDim = 'executor'; // 'executor' | 'org'
+        let taskRankSortKey = 'tasks';   // 默认按任务数排序
+        let taskRankSortDir = 'desc';    // 默认降序
+        
+        const executorRankData = [
+            { rank: 1, name: '宋克祥', org: '金华分行营业部', tasks: 3686, executed: 753, execRate: '50%', responded: 756, respRate: '50%', success: 945, succRate: '75%', expired: 337 },
+            { rank: 2, name: '巫刚',   org: '三江支行',     tasks: 1773, executed: 185, execRate: '50%', responded: 448, respRate: '50%', success: 611, succRate: '98%', expired: 527 },
+            { rank: 3, name: '景霞',   org: '望春支行',     tasks: 2057, executed: 801, execRate: '66%', responded: 813, respRate: '66%', success: 168, succRate: '75%', expired: 373 },
+            { rank: 4, name: '师达',   org: '天派支行',     tasks: 4558, executed: 553, execRate: '50%', responded: 447, respRate: '50%', success: 571, succRate: '99%', expired: 759 },
+            { rank: 5, name: '楚士群', org: '海曙支行',     tasks: 1216, executed: 703, execRate: '67%', responded: 726, respRate: '72%', success: 130, succRate: '83%', expired: 574 },
+            { rank: 6, name: '郁辉',   org: '江北支行营业部', tasks: 7251, executed: 430, execRate: '72%', responded: 441, respRate: '72%', success: 152, succRate: '75%', expired: 358 }
+        ];
+        
+        // 按执行机构维度数据
+        const orgRankData = [
+            { rank: 1, orgName: '金华分行营业部',   headcount: 58, tasks: 12850, executed: 4200, execRate: '32.68%', responded: 3800, respRate: '29.57%', success: 1520, succRate: '11.83%', expired: 1240 },
+            { rank: 2, orgName: '三江支行',         headcount: 42, tasks: 9830,  executed: 3100, execRate: '31.54%', responded: 2800, respRate: '28.48%', success: 1180, succRate: '12.00%', expired: 980 },
+            { rank: 3, orgName: '望春支行',         headcount: 36, tasks: 8750,  executed: 2750, execRate: '31.43%', responded: 2500, respRate: '28.57%', success: 1050, succRate: '12.00%', expired: 860 },
+            { rank: 4, orgName: '天派支行',         headcount: 31, tasks: 7620,  executed: 2400, execRate: '31.50%', responded: 2150, respRate: '28.22%', success: 910,  succRate: '11.94%', expired: 750 },
+            { rank: 5, orgName: '海曙支行',         headcount: 28, tasks: 6980,  executed: 2200, execRate: '31.52%', responded: 1980, respRate: '28.37%', success: 830,  succRate: '11.89%', expired: 680 },
+            { rank: 6, orgName: '江北支行营业部',   headcount: 25, tasks: 6120,  executed: 1900, execRate: '31.05%', responded: 1720, respRate: '28.10%', success: 720,  succRate: '11.76%', expired: 600 }
+        ];
+        
+        // 各机构下的客户经理数据
+        const orgManagersData = {
+            '金华分行营业部': [
+                { id: 'KH2023120001', name: '宋克祥' }, { id: 'KH2023120002', name: '张明远' },
+                { id: 'KH2023120003', name: '李瑞华' }, { id: 'KH2023120004', name: '王建华' },
+                { id: 'KH2023120005', name: '陈晓东' }, { id: 'KH2023120006', name: '林志强' },
+                { id: 'KH2023120007', name: '黄伟杰' }, { id: 'KH2023120008', name: '赵丽萍' }
+            ],
+            '三江支行': [
+                { id: 'KH2024010101', name: '巫刚' }, { id: 'KH2024010102', name: '孙文博' },
+                { id: 'KH2024010103', name: '刘建国' }, { id: 'KH2024010104', name: '杨海波' },
+                { id: 'KH2024010105', name: '周雪梅' }
+            ],
+            '望春支行': [
+                { id: 'KH2024010201', name: '景霞' }, { id: 'KH2024010202', name: '吴永强' },
+                { id: 'KH2024010203', name: '郑宏伟' }, { id: 'KH2024010204', name: '何美玲' }
+            ],
+            '天派支行': [
+                { id: 'KH2024010301', name: '师达' }, { id: 'KH2024010302', name: '许文龙' },
+                { id: 'KH2024010303', name: '冯志刚' }
+            ],
+            '海曙支行': [
+                { id: 'KH2024010401', name: '楚士群' }, { id: 'KH2024010402', name: '曹晓峰' },
+                { id: 'KH2024010403', name: '陶国栋' }
+            ],
+            '江北支行营业部': [
+                { id: 'KH2024010501', name: '郁辉' }, { id: 'KH2024010502', name: '蒋天宇' }
+            ]
+        };
+        
+        function switchTaskRankDim(dim) {
+            taskRankDim = dim;
+            taskRankSortKey = 'tasks';
+            taskRankSortDir = 'desc';
+            document.querySelectorAll('.task-rank-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.task-rank-tab[data-dim="' + dim + '"]').classList.add('active');
+            const filterEl = document.getElementById('taskRankFilters');
+            if (dim === 'executor') {
+                filterEl.innerHTML = '<span style="font-size:13px;color:#666;">执行人名称：</span><input type="text" class="filter-input" placeholder="请输入"><span style="font-size:13px;color:#666;">所属机构名称：</span><input type="text" class="filter-input" placeholder="请输入"><button class="btn btn-orange">查询</button><button class="btn">重置</button>';
+            } else {
+                filterEl.innerHTML = '<span style="font-size:13px;color:#666;">执行机构名称：</span><input type="text" class="filter-input" placeholder="请输入"><button class="btn btn-orange">查询</button><button class="btn">重置</button>';
+            }
+            renderTaskRankTable();
+        }
+        
+        function sortTaskRankTable(key) {
+            if (taskRankSortKey === key) {
+                taskRankSortDir = taskRankSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                taskRankSortKey = key;
+                taskRankSortDir = 'desc';
+            }
+            renderTaskRankTable();
+        }
+        
+        function getSortArrow(key) {
+            if (taskRankSortKey !== key) return '<span class="sort-arrow">↕</span>';
+            return '<span class="sort-arrow active">' + (taskRankSortDir === 'asc' ? '↑' : '↓') + '</span>';
+        }
+        
+        function parseSortValue(val) {
+            if (typeof val === 'string' && val.endsWith('%')) return parseFloat(val);
+            return Number(val);
+        }
+        
+        function renderTaskRankTable() {
+            const head = document.getElementById('taskRankTableHead');
+            const body = document.getElementById('taskRankTableBody');
+            
+            // 构建表头，添加排序箭头
+            if (taskRankDim === 'executor') {
+                head.innerHTML = '<tr>' +
+                    '<th>排名</th>' +
+                    '<th>执行人名称</th>' +
+                    '<th>机构名称</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'tasks\')">任务数' + getSortArrow('tasks') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'executed\')">执行数' + getSortArrow('executed') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'execRate\')">执行率' + getSortArrow('execRate') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'responded\')">响应数' + getSortArrow('responded') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'respRate\')">响应率' + getSortArrow('respRate') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'success\')">成功数' + getSortArrow('success') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'succRate\')">成功率' + getSortArrow('succRate') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'expired\')">过期任务数' + getSortArrow('expired') + '</th>' +
+                    '</tr>';
+                
+                // 排序
+                const sorted = [...executorRankData].sort((a, b) => {
+                    const va = parseSortValue(a[taskRankSortKey]);
+                    const vb = parseSortValue(b[taskRankSortKey]);
+                    return taskRankSortDir === 'asc' ? va - vb : vb - va;
+                });
+                
+                let bodyHtml = '';
+                sorted.forEach((row, i) => {
+                    bodyHtml += '<tr>';
+                    bodyHtml += '<td>' + (i + 1) + '</td>';
+                    bodyHtml += '<td>' + row.name + '</td>';
+                    bodyHtml += '<td>' + row.org + '</td>';
+                    bodyHtml += '<td>' + row.tasks + '</td>';
+                    bodyHtml += '<td>' + row.executed + '</td>';
+                    bodyHtml += '<td>' + row.execRate + '</td>';
+                    bodyHtml += '<td>' + row.responded + '</td>';
+                    bodyHtml += '<td>' + row.respRate + '</td>';
+                    bodyHtml += '<td>' + row.success + '</td>';
+                    bodyHtml += '<td>' + row.succRate + '</td>';
+                    bodyHtml += '<td>' + row.expired + '</td>';
+                    bodyHtml += '</tr>';
+                });
+                body.innerHTML = bodyHtml;
+            } else {
+                head.innerHTML = '<tr>' +
+                    '<th>排名</th>' +
+                    '<th>执行机构名称</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'headcount\')">执行人总数' + getSortArrow('headcount') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'tasks\')">任务数' + getSortArrow('tasks') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'executed\')">执行数' + getSortArrow('executed') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'execRate\')">执行率' + getSortArrow('execRate') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'responded\')">响应数' + getSortArrow('responded') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'respRate\')">响应率' + getSortArrow('respRate') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'success\')">成功数' + getSortArrow('success') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'succRate\')">成功率' + getSortArrow('succRate') + '</th>' +
+                    '<th class="sortable" onclick="sortTaskRankTable(\'expired\')">过期任务数' + getSortArrow('expired') + '</th>' +
+                    '</tr>';
+                
+                const sorted = [...orgRankData].sort((a, b) => {
+                    const va = parseSortValue(a[taskRankSortKey]);
+                    const vb = parseSortValue(b[taskRankSortKey]);
+                    return taskRankSortDir === 'asc' ? va - vb : vb - va;
+                });
+                
+                let bodyHtml = '';
+                sorted.forEach((row, i) => {
+                    bodyHtml += '<tr>';
+                    bodyHtml += '<td>' + (i + 1) + '</td>';
+                    bodyHtml += '<td>' + row.orgName + '</td>';
+                    bodyHtml += '<td><span class="task-rank-count-link" onclick="showManagerModal(\'' + row.orgName + '\')">' + row.headcount + '</span></td>';
+                    bodyHtml += '<td>' + row.tasks + '</td>';
+                    bodyHtml += '<td>' + row.executed + '</td>';
+                    bodyHtml += '<td>' + row.execRate + '</td>';
+                    bodyHtml += '<td>' + row.responded + '</td>';
+                    bodyHtml += '<td>' + row.respRate + '</td>';
+                    bodyHtml += '<td>' + row.success + '</td>';
+                    bodyHtml += '<td>' + row.succRate + '</td>';
+                    bodyHtml += '<td>' + row.expired + '</td>';
+                    bodyHtml += '</tr>';
+                });
+                body.innerHTML = bodyHtml;
+            }
+        }
+        
+        function showManagerModal(orgName) {
+            document.getElementById('managerModalTitle').textContent = orgName + ' - 客户经理列表';
+            const managers = orgManagersData[orgName] || [];
+            let html = '';
+            managers.forEach(m => {
+                html += '<tr><td>' + m.id + '</td><td>' + m.name + '</td></tr>';
+            });
+            document.getElementById('managerModalBody').innerHTML = html;
+            document.getElementById('managerModalOverlay').style.display = 'block';
+            document.getElementById('managerModal').style.display = 'block';
+        }
+        
+        function hideManagerModal() {
+            document.getElementById('managerModalOverlay').style.display = 'none';
+            document.getElementById('managerModal').style.display = 'none';
+        }
+        
+        // 初始化
+        switchTaskRankDim('executor');
+
+        // 渠道Tab切换
+        document.querySelectorAll('.channel-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.channel-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.channel-metric-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const index = Array.from(document.querySelectorAll('.channel-tab')).indexOf(this);
+                document.querySelectorAll('.channel-metric-card')[index].classList.add('active');
+            });
+        });
+
+        // 渠道卡片点击
+        document.querySelectorAll('.channel-metric-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.channel-metric-card').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.channel-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const index = Array.from(document.querySelectorAll('.channel-metric-card')).indexOf(this);
+                document.querySelectorAll('.channel-tab')[index].classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
